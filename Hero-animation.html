@@ -15,7 +15,7 @@
       --accent-transparent: rgba(0,179,178,0.15);
       --animation-duration: 3s;
       --animation-easing: cubic-bezier(0.4,0,0.2,1);
-      --path-end-position: 60%;
+      --path-end-position: 65%;
     }
 
     * {
@@ -53,10 +53,11 @@
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;
-      width: 100vw;
-      height: 100vh;
-      min-height: 100vh;
+      width: 100%;
+      height: 100vh ;
+      min-height: auto;
       padding: 0 80px 80px 80px; /* Added bottom padding for flex-end alignment */
+      margin: 0 auto;
     }
 
     .hero-subtitle {
@@ -177,6 +178,8 @@
     @media (max-width: 640px) {
       .hero-section {
         padding: 0 24px 40px 24px;
+        height: 350px;
+        min-height: auto;
       }
     }
 
@@ -233,7 +236,7 @@
     <div class="animation-container">
     
       <div class="animation-bg">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <svg id="hero-arc-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
           <!-- Semicircular path -->
           <path id="semicircle-path" 
                 d="M 0 0 A 50 100 0 0 0 100 0" 
@@ -251,11 +254,11 @@
           
           <!-- Hidden SVG circle (replaced by separate SVG) -->
             <circle class="moving-circle" 
-                    r="1" 
+                    r="4" 
                     fill="var(--accent-color)" 
                     cx="0" cy="0" 
                     vector-effect="non-scaling-stroke" 
-                    style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; opacity: 0;"/>
+                     style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg; opacity: 0;"/>
         </svg>
       </div>
     </div>
@@ -273,6 +276,47 @@
       pathEndPosition: 60,
       transitionDelay: 0
     };
+
+    // Ensure the arc starts and ends at the left/right edges of the visible SVG
+    function updateArcGeometry() {
+      const svg = document.getElementById('hero-arc-svg');
+      const pathEl = document.getElementById('semicircle-path');
+      if (!svg || !pathEl) return;
+
+      // Use current rendered size to calculate viewBox aspect
+      const rect = svg.getBoundingClientRect();
+      const containerWidth = Math.max(rect.width, 1);
+      const containerHeight = Math.max(rect.height, 1);
+      const aspectRatio = containerWidth / containerHeight;
+
+      const viewBoxHeight = 100;
+      const viewBoxWidth = Math.max(100 * aspectRatio, 1);
+      svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+
+      const baselineY = 0; // endpoints at top edge
+      const rx = viewBoxWidth / 2;           // span full width
+      const ry = viewBoxHeight;              // bow down to bottom edge
+
+      const d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}`;
+      pathEl.setAttribute('d', d);
+
+      const motionPath = `path('M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}')`;
+
+      const movingLine = document.querySelector('.moving-vertical-line');
+      if (movingLine) {
+        movingLine.style.offsetPath = motionPath;
+      }
+
+      const movingCircle = document.querySelector('.moving-circle');
+      if (movingCircle) {
+        movingCircle.style.offsetPath = motionPath;
+      }
+
+      const separateCircle = document.querySelector('.circle-svg-container');
+      if (separateCircle) {
+        separateCircle.style.offsetPath = motionPath;
+      }
+    }
 
     // Optimized text reveal animation
     class TextRevealAnimator {
@@ -342,6 +386,8 @@
 
     // Initialize when DOM is ready
     function initializeAnimations() {
+      // Match arc to current viewport within section
+      updateArcGeometry();
       // Add 0.5s delay before starting text animation
       setTimeout(() => {
         const heroSubtitle = document.querySelector('.hero-subtitle');
@@ -368,6 +414,7 @@
       resizeTimeout = setTimeout(() => {
         // Add 0.5s delay for text animation on resize too
         setTimeout(() => {
+          updateArcGeometry();
           const heroSubtitle = document.querySelector('.hero-subtitle');
           if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
 
