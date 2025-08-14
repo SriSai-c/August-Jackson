@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>August Jackson - Creative Agency</title>
+  
+  <style>
+    /* CSS Custom Properties for maintainability */
+    :root {
+      --primary-bg: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --accent-color: #00b3b2;
+      --accent-transparent: rgba(0,179,178,0.15);
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 60%;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Background Animation Layer */
+    .animation-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .animation-bg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Content Layer */
+    .hero-section {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      padding: 0 80px 80px 80px; /* Added bottom padding for flex-end alignment */
+    }
+
+    .hero-subtitle {
+      max-width: 700px;
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 5vw, 72px);
+      font-weight: 900;
+      line-height: 0.9;
+      margin-bottom: 40px;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(15px, 1.2vw, 18px);
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 540px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing);
+    }
+
+    .hero-subtitle.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Text Animation */
+    .animated-text span {
+      opacity: 0;
+      display: inline-block;
+      transition: opacity 0.3s var(--animation-easing);
+      will-change: opacity;
+    }
+
+    .animated-text span.revealed {
+      opacity: 1;
+    }
+
+    /* SVG Animations */
+    .moving-circle {
+      opacity: 0;
+      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+      will-change: opacity, offset-distance;
+    }
+
+    .moving-vertical-line {
+      opacity: 0;
+      animation: elementMove var(--animation-duration) var(--animation-easing) 0s forwards;
+      will-change: opacity, offset-distance;
+    }
+
+    /* Semicircle path animation - right to left reveal */
+    .animated-path {
+      stroke-dasharray: 314; /* Approximate path length for semicircle (π * 100) */
+      stroke-dashoffset: -314; /* Negative for right-to-left animation */
+      opacity: 0;
+      animation: drawSemicircle var(--animation-duration) var(--animation-easing) 0s forwards;
+      will-change: stroke-dashoffset, opacity;
+    }
+
+    @keyframes drawSemicircle {
+      0% {
+        stroke-dashoffset: -314;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    @keyframes elementMove {
+      0% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+      80% {
+        opacity: 1;
+        offset-distance: var(--path-end-position);
+      }
+      100% {
+        opacity: 1;
+        offset-distance: var(--path-end-position);
+      }
+    }
+
+    /* Responsive Design with Container Queries fallback */
+    @media (max-width: 1200px) {
+      .hero-section {
+        padding: 0 60px 60px 60px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-section {
+        padding: 0 40px 40px 40px;
+      }
+      
+      .hero-title {
+        margin-bottom: 30px;
+      }
+      
+      .hero-subtitle {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-section {
+        padding: 0 24px 40px 24px;
+      }
+    }
+
+    /* Performance optimizations */
+    .animation-bg,
+    .moving-circle,
+    .moving-vertical-line {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .moving-circle,
+      .moving-vertical-line,
+      .animated-text span,
+      .animated-path {
+        animation-duration: 0.1s;
+        transition-duration: 0.1s;
+      }
+      .hero-subtitle {
+        transition-duration: 0.1s;
+      }
+    }
+
+    /* Separate SVG Circle (Method 2) */
+    .circle-svg-container {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      z-index: 1;
+      offset-path: path('M 0 0 A 50 100 0 0 0 100 0');
+      offset-distance: 0%;
+      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+      will-change: opacity, offset-distance;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+    }
+
+    .circle-svg-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .separate-circle {
+      fill: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+
+  
+  <main class="hero-section">
+    <div class="animation-container">
+    
+      <div class="animation-bg">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <!-- Semicircular path -->
+          <path id="semicircle-path" 
+                d="M 0 0 A 50 100 0 0 0 100 0" 
+                stroke="var(--accent-transparent)" 
+                stroke-width="0.25" 
+                fill="none" 
+                class="animated-path" />
+          
+          <!-- Animated vertical line -->
+          <line class="moving-vertical-line" 
+                x1="0" y1="-150" x2="0" y2="150" 
+                stroke="var(--accent-transparent)" 
+                stroke-width="0.25" 
+                style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg;"/>
+          
+          <!-- Hidden SVG circle (replaced by separate SVG) -->
+            <circle class="moving-circle" 
+                    r="1" 
+                    fill="var(--accent-color)" 
+                    cx="0" cy="0" 
+                    vector-effect="non-scaling-stroke" 
+                    style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; opacity: 0;"/>
+        </svg>
+      </div>
+    </div>
+    <div class="hero-content">
+      <h1 id="headline" class="hero-title animated-text" aria-label="August Jackson"></h1>
+      <p class="hero-subtitle">A global creative agency specializing in high-impact event experiences and strategic communications.</p>
+    </div>
+  </main>
+
+  <script>
+    // Configuration
+    const CONFIG = {
+      text: "AUGUST JACKSON",
+      animationDuration: 925,
+      pathEndPosition: 60,
+      transitionDelay: 0
+    };
+
+    // Optimized text reveal animation
+    class TextRevealAnimator {
+      constructor(config, onComplete) {
+        this.config = config;
+        this.onComplete = onComplete;
+        this.spans = [];
+        this.isAnimating = false;
+      }
+
+      init() {
+        this.createSpans();
+        this.startAnimation();
+      }
+
+      createSpans() {
+        const headline = document.getElementById("headline");
+        if (!headline) return;
+
+        headline.innerHTML = "";
+        
+        this.config.text.split("").forEach((char, index) => {
+          const span = document.createElement("span");
+          span.textContent = char;
+          span.dataset.index = index;
+          headline.appendChild(span);
+        });
+
+        this.spans = headline.querySelectorAll('span');
+      }
+
+      startAnimation() {
+        if (this.isAnimating || !this.spans.length) return;
+        this.isAnimating = true;
+
+        // Use requestAnimationFrame for better performance
+        requestAnimationFrame(() => {
+          this.calculateRevealTiming();
+        });
+      }
+
+      calculateRevealTiming() {
+        const viewportWidth = window.innerWidth;
+        let maxRevealTime = 0;
+        
+        this.spans.forEach((span) => {
+          const rect = span.getBoundingClientRect();
+          const spanCenterX = rect.left + (rect.width / 2);
+          const positionPercent = (spanCenterX / viewportWidth) * 100;
+          const revealTime = (positionPercent / this.config.pathEndPosition) * this.config.animationDuration;
+          maxRevealTime = Math.max(maxRevealTime, Math.max(0, revealTime));
+          
+          setTimeout(() => {
+            span.classList.add('revealed');
+          }, Math.max(0, revealTime));
+        });
+
+        // Fire completion slightly after the last span finishes its fade-in
+        const completionDelayMs = maxRevealTime + 320; // 320ms ~ span transition + buffer
+        if (typeof this.onComplete === 'function') {
+          setTimeout(() => {
+            this.onComplete();
+          }, completionDelayMs);
+        }
+      }
+    }
+
+    // Initialize when DOM is ready
+    function initializeAnimations() {
+      // Add 0.5s delay before starting text animation
+      setTimeout(() => {
+        const heroSubtitle = document.querySelector('.hero-subtitle');
+        if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
+
+        const animator = new TextRevealAnimator(CONFIG, () => {
+          if (heroSubtitle) heroSubtitle.classList.add('is-visible');
+        });
+        animator.init();
+      }, 500); // 0.5s delay
+    }
+
+    // Performance-optimized DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeAnimations);
+    } else {
+      initializeAnimations();
+    }
+
+    // Handle resize events with debouncing
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Add 0.5s delay for text animation on resize too
+        setTimeout(() => {
+          const heroSubtitle = document.querySelector('.hero-subtitle');
+          if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
+
+          const animator = new TextRevealAnimator(CONFIG, () => {
+            if (heroSubtitle) heroSubtitle.classList.add('is-visible');
+          });
+          animator.init();
+        }, 500); // 0.5s delay
+      }, 250);
+    });
+  </script>
+</body>
+</html>
