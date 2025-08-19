@@ -38,7 +38,8 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      overflow: hidden;
+      overflow: visible;
+      bottom: -150px;
     }
 
     .animation-bg svg {
@@ -54,7 +55,7 @@
       align-items: flex-end;
       justify-content: flex-start;
       width: 100%;
-      height: 100vh ;
+      height: 550px ;
       min-height: auto;
       padding: 0 80px 80px 80px; /* Added bottom padding for flex-end alignment */
       margin: 0 auto;
@@ -112,16 +113,12 @@
       will-change: opacity, offset-distance;
     }
 
-    .moving-vertical-line {
-      opacity: 0;
-      animation: elementMove var(--animation-duration) var(--animation-easing) 0s forwards;
-      will-change: opacity, offset-distance;
-    }
+
 
     /* Semicircle path animation - right to left reveal */
     .animated-path {
-      stroke-dasharray: 350; /* Approximate path length for semicircle (π * 100) */
-      stroke-dashoffset: -350; /* Negative for right-to-left animation */
+      stroke-dasharray: 350; /* Dynamic path length */
+      stroke-dashoffset: -350; /* Start hidden */
       opacity: 0;
       animation: drawSemicircle var(--animation-duration) var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
@@ -183,19 +180,21 @@
       }
       .hero-section {
         padding: 0 24px 40px 24px;
-        height: 600px;
+        height: 400px;
         min-height: auto;
       }
+      .animation-bg{
+        bottom: 0;
+      }
       #hero-arc-svg{
-        max-height: 300px;
+        max-height: 180px;
         overflow: visible;
       }
     }
 
     /* Performance optimizations */
     .animation-bg,
-    .moving-circle,
-    .moving-vertical-line {
+    .moving-circle {
       transform: translateZ(0);
       backface-visibility: hidden;
     }
@@ -203,7 +202,6 @@
     /* Reduced motion support */
     @media (prefers-reduced-motion: reduce) {
       .moving-circle,
-      .moving-vertical-line,
       .animated-text span,
       .animated-path {
         animation-duration: 0.1s;
@@ -248,32 +246,23 @@
         <svg id="hero-arc-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
           <!-- Semicircular path -->
           <path id="semicircle-path" 
-                d="M 0 0 A 50 100 0 0 0 100 0" 
+                d="M 0 100 A 50 100 0 0 1 100 100" 
                 stroke="var(--accent-transparent)" 
                 stroke-width="0.25" 
                 fill="none" 
                 class="animated-path" />
-          
-          <!-- Animated vertical line -->
-          <line class="moving-vertical-line" 
-                x1="0" y1="-150" x2="0" y2="150" 
-                stroke="var(--accent-transparent)" 
-                stroke-width="0.25" 
-                style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg;"/>
-          
           <!-- Hidden SVG circle (replaced by separate SVG) -->
             <circle class="moving-circle" 
                     r="4" 
                     fill="var(--accent-color)" 
                     cx="0" cy="0" 
                     vector-effect="non-scaling-stroke" 
-                     style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg; opacity: 0;"/>
+                     style="offset-distance: 0%; offset-rotate: 0deg; opacity: 0;"/>
         </svg>
       </div>
     </div>
     <div class="hero-content">
-      <h1 id="headline" class="hero-title animated-text" aria-label="August Jackson">August Jackson</h1>
-      <p class="hero-subtitle">A global creative agency specializing in high-impact event experiences and strategic communications.</p>
+      <p class="hero-subtitle">Reimagining Executive Summits to Drive Engagement and Innovation at Scale</p>
     </div>
   </main>
 
@@ -292,32 +281,48 @@
       const pathEl = document.getElementById('semicircle-path');
       if (!svg || !pathEl) return;
 
+      // Use hero-section height instead of window height for calculations
+      const heroSection = document.querySelector('.hero-section');
+      const heroRect = heroSection ? heroSection.getBoundingClientRect() : null;
+      const heroHeight = heroRect ? heroRect.height : window.innerHeight;
+      
+      // Check if we're below 680px breakpoint
+      const isBelow680px = window.innerWidth <= 680;
+      
       // Use current rendered size to calculate viewBox aspect
       const rect = svg.getBoundingClientRect();
       const containerWidth = Math.max(rect.width, 1);
-      const containerHeight = Math.max(rect.height, 1);
+      
+      // For below 680px, use 180px height, otherwise use hero-section height
+      const effectiveHeight = isBelow680px ? 180 : heroHeight;
+      const containerHeight = Math.max(effectiveHeight, 1);
       const aspectRatio = containerWidth / containerHeight;
 
       const viewBoxHeight = 100;
       const viewBoxWidth = Math.max(100 * aspectRatio, 1);
       svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
 
-      // Check if we're below 680px breakpoint
-      const isBelow680px = window.innerWidth <= 680;
+      // For below 680px, make arc touch the edges like Hero-animation.html
+      let baselineY, rx, ry, d, motionPath;
       
-      const baselineY = isBelow680px ? 50 : 0; // endpoints at top edge (or 50 for small screens)
-      const rx = viewBoxWidth / 2;           // span full width
-      const ry = isBelow680px ? 50 : viewBoxHeight;              // bow down to bottom edge (or 50 for small screens)
-
-      const d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}`;
-      pathEl.setAttribute('d', d);
-
-      const motionPath = `path('M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}')`;
-
-      const movingLine = document.querySelector('.moving-vertical-line');
-      if (movingLine) {
-        movingLine.style.offsetPath = motionPath;
+      if (isBelow680px) {
+        // Below 680px: arc touches edges, shallow curve with 180px height
+        baselineY = 50; // middle of viewBox
+        rx = viewBoxWidth / 2; // span full width
+        ry = 50; // shallow curve
+        d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 1 ${viewBoxWidth} ${baselineY}`;
+      } else {
+        // Above 680px: normal upside down semicircle
+        baselineY = viewBoxHeight; // endpoints at bottom edge
+        rx = viewBoxWidth / 2; // span full width
+        ry = viewBoxHeight; // bow up to top edge
+        d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 1 ${viewBoxWidth} ${baselineY}`;
       }
+      
+      pathEl.setAttribute('d', d);
+      motionPath = `path('${d}')`;
+
+
 
       const movingCircle = document.querySelector('.moving-circle');
       if (movingCircle) {

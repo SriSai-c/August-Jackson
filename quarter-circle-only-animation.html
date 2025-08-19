@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>August Jackson - Creative Agency</title>
+  <title>Quarter Circle Animation - August Jackson</title>
   
   <style>
     /* CSS Custom Properties for maintainability */
     :root {
       --primary-bg: #111111;
-      --text-primary: #ffffff;
-      --text-secondary: #cccccc;
+      --text-primary: #FFFFFF;
+      --text-secondary: #666666;
       --accent-color: #00B3B2;
       --accent-transparent: #30363D;
       --animation-duration: 3s;
       --animation-easing: cubic-bezier(0.4,0,0.2,1);
-      --path-end-position: 65%;
+      --path-end-position: 80%;
     }
 
     * {
@@ -35,15 +35,17 @@
     /* Background Animation Layer */
     .animation-bg {
       position: absolute;
-      inset: 0;
+      top: 0;
+      right: 0;
       z-index: 0;
       pointer-events: none;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .animation-bg svg {
-      width: 100%;
-      height: 100%;
+      width: 400px;
+      height: 400px;
+      overflow: visible;
     }
 
     /* Content Layer */
@@ -54,14 +56,14 @@
       align-items: flex-end;
       justify-content: flex-start;
       width: 100%;
-      height: 100vh ;
+      height: 400px;
       min-height: auto;
-      padding: 0 80px 80px 80px; /* Added bottom padding for flex-end alignment */
+      padding: 0 80px 80px 80px;
       margin: 0 auto;
     }
 
     .hero-subtitle {
-      max-width: 700px;
+      max-width: 800px;
     }
 
     .hero-title {
@@ -80,7 +82,6 @@
       font-size: clamp(15px, 1.2vw, 18px);
       line-height: 1.6;
       color: var(--text-secondary);
-      max-width: 540px;
       font-weight: 400;
       letter-spacing: 0.03em;
       opacity: 0;
@@ -112,24 +113,20 @@
       will-change: opacity, offset-distance;
     }
 
-    .moving-vertical-line {
-      opacity: 0;
-      animation: elementMove var(--animation-duration) var(--animation-easing) 0s forwards;
-      will-change: opacity, offset-distance;
-    }
 
-    /* Semicircle path animation - right to left reveal */
+
+    /* Quarter circle path animation - left-top to right-bottom reveal */
     .animated-path {
-      stroke-dasharray: 350; /* Approximate path length for semicircle (π * 100) */
-      stroke-dashoffset: -350; /* Negative for right-to-left animation */
+      stroke-dasharray: 628; /* π * 400 / 2 for quarter circle radius 400 */
+      stroke-dashoffset: 628;
       opacity: 0;
-      animation: drawSemicircle var(--animation-duration) var(--animation-easing) 0s forwards;
+      animation: drawQuarterCircle var(--animation-duration) var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
     }
 
-    @keyframes drawSemicircle {
+    @keyframes drawQuarterCircle {
       0% {
-        stroke-dashoffset: -350;
+        stroke-dashoffset: 628;
         opacity: 0;
       }
       10% {
@@ -148,15 +145,15 @@
       }
       80% {
         opacity: 1;
-        offset-distance: var(--path-end-position);
+        offset-distance: 50%;
       }
       100% {
         opacity: 1;
-        offset-distance: var(--path-end-position);
+        offset-distance: 50%;
       }
     }
 
-    /* Responsive Design with Container Queries fallback */
+    /* Responsive Design */
     @media (max-width: 1200px) {
       .hero-section {
         padding: 0 60px 60px 60px;
@@ -183,19 +180,41 @@
       }
       .hero-section {
         padding: 0 24px 40px 24px;
-        height: 600px;
+        height: 400px;
         min-height: auto;
       }
-      #hero-arc-svg{
-        max-height: 300px;
-        overflow: visible;
+      .animation-bg{
+        width: 160px;
+        overflow-x: clip;
+        padding-left: 24px;
+        box-sizing: content-box;
+      }
+      
+      /* Smaller circle radius for mobile */
+      .moving-circle {
+        r: 12;
+      }
+      @keyframes elementMove {
+      0% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+      80% {
+        opacity: 1;
+        offset-distance: 25%;
+      }
+      100% {
+        opacity: 1;
+        offset-distance: 25%;
       }
     }
+    }
+
+
 
     /* Performance optimizations */
     .animation-bg,
-    .moving-circle,
-    .moving-vertical-line {
+    .moving-circle {
       transform: translateZ(0);
       backface-visibility: hidden;
     }
@@ -203,7 +222,6 @@
     /* Reduced motion support */
     @media (prefers-reduced-motion: reduce) {
       .moving-circle,
-      .moving-vertical-line,
       .animated-text span,
       .animated-path {
         animation-duration: 0.1s;
@@ -214,66 +232,39 @@
       }
     }
 
-    /* Separate SVG Circle (Method 2) */
-    .circle-svg-container {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      z-index: 1;
-      offset-path: path('M 0 0 A 50 100 0 0 0 100 0');
-      offset-distance: 0%;
-      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
-      will-change: opacity, offset-distance;
-      opacity: 0;
-      transform: translate(-50%, -50%);
-    }
 
-    .circle-svg-container svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    .separate-circle {
-      fill: var(--accent-color);
-    }
   </style>
 </head>
 <body>
 
-  
   <main class="hero-section">
     <div class="animation-container">
     
-      <div class="animation-bg">
-        <svg id="hero-arc-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <!-- Semicircular path -->
-          <path id="semicircle-path" 
-                d="M 0 0 A 50 100 0 0 0 100 0" 
+              <div class="animation-bg">
+          <svg id="hero-arc-svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+
+            
+            <!-- Shallow arc path - starts from top (400px from right), gentle curve to bottom -->
+          <path id="quarter-circle-path" 
+                d="M0,0 A400,400 0 0,0 400,400" 
                 stroke="var(--accent-transparent)" 
-                stroke-width="0.25" 
+                stroke-width="0.5" 
                 fill="none" 
                 class="animated-path" />
           
-          <!-- Animated vertical line -->
-          <line class="moving-vertical-line" 
-                x1="0" y1="-150" x2="0" y2="150" 
-                stroke="var(--accent-transparent)" 
-                stroke-width="0.25" 
-                style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg;"/>
-          
-          <!-- Hidden SVG circle (replaced by separate SVG) -->
-            <circle class="moving-circle" 
-                    r="4" 
-                    fill="var(--accent-color)" 
-                    cx="0" cy="0" 
-                    vector-effect="non-scaling-stroke" 
-                     style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg; opacity: 0;"/>
+          <!-- Moving circle -->
+          <circle class="moving-circle" 
+                  r="20" 
+                  fill="var(--accent-color)" 
+                  cx="0" cy="0" 
+                  vector-effect="non-scaling-stroke" 
+                   style="offset-distance: 0; offset-rotate: 0deg; opacity: 0;"/>
         </svg>
       </div>
     </div>
     <div class="hero-content">
-      <h1 id="headline" class="hero-title animated-text" aria-label="August Jackson">August Jackson</h1>
-      <p class="hero-subtitle">A global creative agency specializing in high-impact event experiences and strategic communications.</p>
+      <h1 id="headline" class="hero-title animated-text" aria-label="About Us">Our Work</h1>
+      <p class="hero-subtitle">Discover how AJ helps leading organizations energize, align, and inspire stakeholders to achieve lasting impact.</p>
     </div>
   </main>
 
@@ -286,48 +277,30 @@
       transitionDelay: 0
     };
 
-    // Ensure the arc starts and ends at the left/right edges of the visible SVG
+    // Responsive SVG geometry - circle follows different paths based on screen size
     function updateArcGeometry() {
       const svg = document.getElementById('hero-arc-svg');
-      const pathEl = document.getElementById('semicircle-path');
+      const pathEl = document.getElementById('quarter-circle-path');
       if (!svg || !pathEl) return;
 
-      // Use current rendered size to calculate viewBox aspect
-      const rect = svg.getBoundingClientRect();
-      const containerWidth = Math.max(rect.width, 1);
-      const containerHeight = Math.max(rect.height, 1);
-      const aspectRatio = containerWidth / containerHeight;
 
-      const viewBoxHeight = 100;
-      const viewBoxWidth = Math.max(100 * aspectRatio, 1);
-      svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
 
-      // Check if we're below 680px breakpoint
-      const isBelow680px = window.innerWidth <= 680;
-      
-      const baselineY = isBelow680px ? 50 : 0; // endpoints at top edge (or 50 for small screens)
-      const rx = viewBoxWidth / 2;           // span full width
-      const ry = isBelow680px ? 50 : viewBoxHeight;              // bow down to bottom edge (or 50 for small screens)
+      // Fixed 400x400 viewBox
+      svg.setAttribute('viewBox', '0 0 400 400');
 
-      const d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}`;
+      // Fixed quarter circle path
+      const d = 'M0,0 A400,400 0 0,0 400,400';
       pathEl.setAttribute('d', d);
 
-      const motionPath = `path('M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}')`;
-
-      const movingLine = document.querySelector('.moving-vertical-line');
-      if (movingLine) {
-        movingLine.style.offsetPath = motionPath;
-      }
+      // Circle follows quarter circle path on all screen sizes
+      const motionPath = 'path(\'M0,0 A400,400 0 0,0 400,400\')';
 
       const movingCircle = document.querySelector('.moving-circle');
       if (movingCircle) {
         movingCircle.style.offsetPath = motionPath;
       }
 
-      const separateCircle = document.querySelector('.circle-svg-container');
-      if (separateCircle) {
-        separateCircle.style.offsetPath = motionPath;
-      }
+
     }
 
     // Optimized text reveal animation
@@ -409,45 +382,36 @@
 
     // Initialize when DOM is ready
     function initializeAnimations() {
-      // Match arc to current viewport within section
+      // Set responsive SVG geometry
       updateArcGeometry();
       
-      // Check if title exists
+      // Read text from HTML element
       const headlineElement = document.getElementById('headline');
-      const heroTitle = document.querySelector('.hero-title');
+      const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
       
-      // Add 0.5s delay before starting animations
+      // Create config with text from HTML
+      const dynamicConfig = {
+        text: textFromHTML,
+        animationDuration: 925,
+        pathEndPosition: 60,
+        transitionDelay: 0
+      };
+      
+      // Add 0.5s delay before starting text animation
       setTimeout(() => {
         const heroSubtitle = document.querySelector('.hero-subtitle');
+        const heroTitle = document.querySelector('.hero-title');
         
         if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
-        
-        // Only animate title if it exists
         if (heroTitle) {
           heroTitle.style.opacity = '1';
           heroTitle.style.visibility = 'visible';
-          
-          // Read text from HTML element for title animation
-          const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
-          
-          // Create config with text from HTML
-          const dynamicConfig = {
-            text: textFromHTML,
-            animationDuration: 925,
-            pathEndPosition: 60,
-            transitionDelay: 0
-          };
-
-          const animator = new TextRevealAnimator(dynamicConfig, () => {
-            if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-          });
-          animator.init();
-        } else {
-          // If no title, just show subtitle after delay
-          setTimeout(() => {
-            if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-          }, 1000); // 1s delay when no title
         }
+
+        const animator = new TextRevealAnimator(dynamicConfig, () => {
+          if (heroSubtitle) heroSubtitle.classList.add('is-visible');
+        });
+        animator.init();
       }, 500); // 0.5s delay
     }
 
@@ -458,50 +422,16 @@
       initializeAnimations();
     }
 
-    // Handle resize events with debouncing
+    // Handle resize events to update circle path
     let resizeTimeout;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        // Add 0.5s delay for text animation on resize too
-        setTimeout(() => {
-          updateArcGeometry();
-          
-          // Check if title exists on resize too
-          const headlineElement = document.getElementById('headline');
-          const heroTitle = document.querySelector('.hero-title');
-          const heroSubtitle = document.querySelector('.hero-subtitle');
-          
-          if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
-          
-          // Only animate title if it exists
-          if (heroTitle) {
-            heroTitle.style.opacity = '1';
-            heroTitle.style.visibility = 'visible';
-            
-            // Read text from HTML element for title animation
-            const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
-            
-            const dynamicConfig = {
-              text: textFromHTML,
-              animationDuration: 925,
-              pathEndPosition: 60,
-              transitionDelay: 0
-            };
-
-            const animator = new TextRevealAnimator(dynamicConfig, () => {
-              if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-            });
-            animator.init();
-          } else {
-            // If no title, just show subtitle after delay
-            setTimeout(() => {
-              if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-            }, 1000); // 1s delay when no title
-          }
-        }, 500); // 0.5s delay
+        updateArcGeometry();
       }, 250);
     });
+
+
   </script>
 </body>
 </html>
