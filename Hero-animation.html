@@ -118,10 +118,9 @@
       will-change: opacity, offset-distance;
     }
 
-    /* Semicircle path animation - right to left reveal */
+    /* Semicircle path animation - left to right reveal */
     .animated-path {
-      stroke-dasharray: 350; /* Approximate path length for semicircle (π * 100) */
-      stroke-dashoffset: -350; /* Negative for right-to-left animation */
+      stroke-dasharray: var(--path-length, 350); /* Dynamic path length */
       opacity: 0;
       animation: drawSemicircle var(--animation-duration) var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
@@ -311,6 +310,10 @@
 
       const d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}`;
       pathEl.setAttribute('d', d);
+
+      // Calculate the actual path length
+      const pathLength = pathEl.getTotalLength();
+      document.documentElement.style.setProperty('--path-length', pathLength);
 
       const motionPath = `path('M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}')`;
 

@@ -117,8 +117,7 @@
 
     /* Semicircle path animation - right to left reveal */
     .animated-path {
-      stroke-dasharray: 350; /* Dynamic path length */
-      stroke-dashoffset: -350; /* Start hidden */
+      stroke-dasharray: var(--path-length, 350); /* Dynamic path length */
       opacity: 0;
       animation: drawSemicircle var(--animation-duration) var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
@@ -189,6 +188,9 @@
       #hero-arc-svg{
         max-height: 180px;
         overflow: visible;
+      }
+      .moving-circle{
+        r: 7;
       }
     }
 
@@ -306,8 +308,8 @@
       let baselineY, rx, ry, d, motionPath;
       
       if (isBelow680px) {
-        // Below 680px: arc touches edges, shallow curve with 180px height
-        baselineY = 50; // middle of viewBox
+        // Below 680px: arc touches edges at bottom of SVG, shallow curve with 180px height
+        baselineY = viewBoxHeight; // bottom of viewBox
         rx = viewBoxWidth / 2; // span full width
         ry = 50; // shallow curve
         d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 1 ${viewBoxWidth} ${baselineY}`;
@@ -320,6 +322,11 @@
       }
       
       pathEl.setAttribute('d', d);
+
+      // Calculate the actual path length
+      const pathLength = pathEl.getTotalLength();
+      document.documentElement.style.setProperty('--path-length', pathLength);
+
       motionPath = `path('${d}')`;
 
 
