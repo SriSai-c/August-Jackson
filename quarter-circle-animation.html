@@ -146,7 +146,7 @@
       }
       80% {
         opacity: 1;
-        offset-distance: calc(var(--path-end-position) + 10%); /* Move 20% further right */
+        offset-distance: calc(var(--path-end-position) + 10%);
       }
       100% {
         opacity: 1;
@@ -183,11 +183,33 @@
         padding: 0 24px 40px 24px;
         height: 400px;
         min-height: auto;
-        overflow: hidden;
       }
       .animation-bg{
         width: 64px;
+        overflow-x: clip;
+        padding-left: 24px;
+        box-sizing: content-box;
       }
+      
+      /* Smaller circle radius for mobile */
+      .moving-circle {
+        r: 12;
+      }
+      
+      @keyframes elementMove {
+      0% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+      80% {
+        opacity: 1;
+        offset-distance: 100%;
+      }
+      100% {
+        opacity: 1;
+        offset-distance: 100%;
+      }
+    }
     }
 
     /* Vertical line animation - fade-in from top to bottom */
