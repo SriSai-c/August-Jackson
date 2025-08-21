@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quarter Circle Animation - August Jackson</title>
+  
+  <style>
+    /* CSS Custom Properties for maintainability */
+    :root {
+      --primary-bg: #ffffff;
+      --text-primary: #000000;
+      --text-secondary: #666666;
+      --accent-color: #00B3B2;
+      --accent-transparent: #D4D4D4;
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 80%;
+      --intersection-point: 63.8%;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Background Animation Layer */
+    .animation-bg {
+      position: absolute;
+      top: 0;
+      right: 200px;
+      z-index: 0;
+      pointer-events: none;
+      overflow: visible;
+      width: 600px;
+      height: 420px;
+    }
+
+    .animation-bg svg {
+      width: 600px;
+      height: 420px;
+      overflow: visible;
+    }
+
+    /* Content Layer */
+    .hero-section {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      width: 100%;
+      min-height: 400px;
+      min-height: auto;
+      padding: 0 80px 80px 80px;
+      margin: 0 auto;
+    }
+
+    .hero-subtitle {
+      max-width: 800px;
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 5vw, 72px);
+      font-weight: 900;
+      line-height: 0.9;
+      margin-bottom: 40px;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(15px, 1.2vw, 18px);
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 540px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing);
+    }
+
+    .hero-subtitle.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Text Animation */
+    .animated-text span {
+      opacity: 0;
+      display: inline-block;
+      transition: opacity 0.3s var(--animation-easing);
+      will-change: opacity;
+    }
+
+    .animated-text span.revealed {
+      opacity: 1;
+    }
+
+    /* SVG Animations */
+    .moving-circle {
+      opacity: 1;
+      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+      will-change: opacity, offset-distance;
+    }
+
+    /* Desktop specific animation - stops at intersection point */
+    .moving-circle.desktop-path {
+      animation: elementMoveDesktop var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+    }
+
+    @keyframes elementMoveDesktop {
+      0% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+              100% {
+          opacity: 1;
+          offset-distance: var(--intersection-point, 63.8%);
+        }
+    }
+
+
+
+    /* Arc path animation - right to left reveal */
+    .animated-path {
+      stroke-dasharray: var(--path-length, 600); /* Dynamic path length */
+      stroke-dashoffset: var(--path-length, 600);
+      opacity: 0;
+      animation: drawQuarterCircle var(--animation-duration) var(--animation-easing) 0s forwards;
+      will-change: stroke-dashoffset, opacity;
+    }
+
+    @keyframes drawQuarterCircle {
+      0% {
+        stroke-dashoffset: var(--path-length, 600);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    @keyframes elementMove {
+      0% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+      80% {
+        opacity: 1;
+        offset-distance: calc(var(--path-end-position) + 10%);
+      }
+      100% {
+        opacity: 1;
+        offset-distance: calc(var(--path-end-position) + 10%);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .hero-section {
+        padding: 0 60px 60px 60px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-section {
+        padding: 0 40px 40px 40px;
+      }
+      
+      .hero-title {
+        margin-bottom: 30px;
+      }
+      
+      .hero-subtitle {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 680px) {
+      :root {
+        --path-end-position: 80%;
+      }
+      .hero-section {
+        padding: 0 24px 40px 24px;
+        min-height: 400px;
+      }
+      .animation-bg{
+        width: 188px;
+        height: 132px;
+        right: 100px;
+        overflow-x: clip;
+        padding-left: 24px;
+        box-sizing: content-box;
+      }
+      
+      /* Smaller circle radius for mobile */
+      .moving-circle {
+        r: 12;
+      }
+      
+      @keyframes elementMove {
+      0% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+      80% {
+        opacity: 1;
+        offset-distance: 100%;
+      }
+      100% {
+        opacity: 1;
+        offset-distance: 100%;
+      }
+    }
+    }
+
+    /* Vertical line animation - fade-in from top to bottom */
+    .vertical-line {
+      stroke-dasharray: 433;
+      stroke-dashoffset: 433;
+      opacity: 0;
+      animation: fadeInVerticalLine var(--animation-duration) var(--animation-easing) 0s forwards;
+      will-change: stroke-dashoffset, opacity;
+    }
+
+    @keyframes fadeInVerticalLine {
+      0% {
+        stroke-dashoffset: 433;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    /* Performance optimizations */
+    .animation-bg,
+    .moving-circle,
+    .vertical-line {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .moving-circle,
+      .animated-text span,
+      .animated-path,
+      .vertical-line {
+        animation-duration: 0.1s;
+        transition-duration: 0.1s;
+      }
+      .hero-subtitle {
+        transition-duration: 0.1s;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="hero-section">
+    <div class="animation-container">
+    
+              <div class="animation-bg">
+          <svg id="hero-arc-svg" viewBox="0 0 600 450" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <!-- Vertical line - positioned 200px from right (400px from left in 600px SVG), extends to intersection -->
+            <line class="vertical-line" 
+                  x1="400" y1="0" x2="400" y2="433" 
+                  stroke="var(--accent-transparent)" 
+                  stroke-width="1" />
+            
+            <!-- Arc path - complete path with both curves as single path (left to right) -->
+          <path id="quarter-circle-path" 
+                d="M0,0 C0,242.721 189.384,433 423,433 L423,433 C656.616,433 846,242.721 846,0" 
+                stroke="var(--accent-transparent)" 
+                stroke-width="1" 
+                fill="none" 
+                class="animated-path" />
+          
+          <!-- Moving circle -->
+          <circle class="moving-circle" 
+                  r="20" 
+                  fill="var(--accent-color)" 
+                  cx="0" cy="0" 
+                  vector-effect="non-scaling-stroke" 
+                   style="offset-rotate: 0deg; opacity: 0;"/>
+        </svg>
+      </div>
+    </div>
+    <div class="hero-content">
+      <h1 id="headline" class="hero-title animated-text" aria-label="About Us">Written by Author name, Title</h1>
+      <p class="hero-subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pretium ipsum ut tortor tempor suscipit. Duis tempor eros massa, a congue justo scelerisque non. Morbi efficitur tortor vitae felis ultrices ultrices. Suspendisse viverra pellentesque nisl. Nam augue neque, congue a elit sed, consectetur fringilla lectus. Morbi mauris augue, vehicula ultrices neque ac, venenatis cursus massa. Etiam non quam turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Cras pretium ipsum ut tortor tempor suscipit. Duis tempor eros massa, a congue justo scelerisque non. Morbi efficitur tortor vitae felis ultrices ultrices. Suspendisse viverra pellentesque nisl. Nam augue neque, congue a elit sed, consectetur fringilla lectus. Morbi mauris augue, vehicula ultrices neque ac, venenatis cursus massa. Etiam non quam turpis.
+      </p>
+    </div>
+  </main>
+
+  <script>
+    // Configuration - read text from HTML
+    const CONFIG = {
+      text: document.getElementById('headline')?.textContent || "AUGUST JACKSON",
+      animationDuration: 925,
+      pathEndPosition: 60,
+      transitionDelay: 0
+    };
+
+        // Function to calculate intersection point of cubic bezier curve with vertical line
+    function calculateIntersectionPoint() {
+      // For the left-to-right path, we need to find where x=400 (vertical line position)
+      // The path goes from left to right: M0,0 -> 423,433 -> 846,0
+      // We need to find the intersection with the first curve (0,0 -> 423,433)
+      
+      const startX = 0, startY = 0;
+      const cp1X = 0, cp1Y = 242.721;
+      const cp2X = 189.384, cp2Y = 433;
+      const endX = 423, endY = 433;
+      
+      const targetX = 400;
+      
+      // Binary search to find the t parameter where x=400
+      let t = 0.5;
+      let step = 0.25;
+      let iterations = 0;
+      
+      while (iterations < 15) { // Increased iterations for more precision
+        // Calculate point on cubic bezier curve at parameter t
+        const x = Math.pow(1-t, 3) * startX + 
+                  3 * Math.pow(1-t, 2) * t * cp1X + 
+                  3 * (1-t) * Math.pow(t, 2) * cp2X + 
+                  Math.pow(t, 3) * endX;
+        
+        if (Math.abs(x - targetX) < 0.1) { // Increased precision
+          break;
+        }
+        
+        if (x > targetX) {
+          t -= step;
+        } else {
+          t += step;
+        }
+        
+        step *= 0.5;
+        iterations++;
+      }
+      
+      return Math.max(0, Math.min(1, t));
+    }
+
+    // SVG geometry - circle follows arc path
+    function updateArcGeometry() {
+      const svg = document.getElementById('hero-arc-svg');
+      const pathEl = document.getElementById('quarter-circle-path');
+      if (!svg || !pathEl) return;
+
+      // Desktop: 600x450 viewBox with full arc
+      svg.setAttribute('viewBox', '0 0 600 450');
+      const d = 'M0,0 C0,242.721 189.384,433 423,433 L423,433 C656.616,433 846,242.721 846,0';
+      pathEl.setAttribute('d', d);
+      
+      // Update vertical line for desktop
+      const verticalLine = document.querySelector('.vertical-line');
+      if (verticalLine) {
+        verticalLine.setAttribute('x1', '400');
+        verticalLine.setAttribute('x2', '400');
+        verticalLine.setAttribute('y1', '0');
+        verticalLine.setAttribute('y2', '433');
+      }
+
+      // Calculate actual path length
+      const pathLength = pathEl.getTotalLength();
+      document.documentElement.style.setProperty('--path-length', pathLength + 'px');
+
+      // Circle follows arc path from left to right and stops at intersection point
+      const motionPath = 'path(\'M0,0 C0,242.721 189.384,433 423,433 L423,433 C656.616,433 400,200 400,200\')';
+
+      const movingCircle = document.querySelector('.moving-circle');
+      if (movingCircle) {
+        movingCircle.style.offsetPath = motionPath;
+        
+        // Calculate the intersection point and set it as CSS custom property
+        // For the left-to-right path, the intersection is at x=400
+        // Since the path goes from 0 to 846, and we want to stop at 400
+        // The intersection percentage is approximately 400/846 * 100 = 47.3%
+        const intersectionPercentage = 63.8;
+        
+        console.log('Intersection calculation:', {
+          targetX: 400,
+          totalPathWidth: 846,
+          intersectionPercentage: intersectionPercentage
+        });
+        
+        document.documentElement.style.setProperty('--intersection-point', intersectionPercentage + '%');
+        console.log('CSS property set:', document.documentElement.style.getPropertyValue('--intersection-point'));
+        movingCircle.classList.add('desktop-path');
+        
+        // Reset offsetDistance to let CSS animation handle the movement
+        movingCircle.style.offsetDistance = '0%';
+        
+        // Set circle starting position
+        movingCircle.setAttribute('cx', '0');
+        movingCircle.setAttribute('cy', '0');
+      }
+    }
+
+    // Optimized text reveal animation
+    class TextRevealAnimator {
+      constructor(config, onComplete) {
+        this.config = config;
+        this.onComplete = onComplete;
+        this.spans = [];
+        this.isAnimating = false;
+      }
+
+      init() {
+        this.createSpans();
+        this.startAnimation();
+      }
+
+      createSpans() {
+        const headline = document.getElementById("headline");
+        if (!headline) return;
+
+        headline.innerHTML = "";
+        
+        // Split text into characters, preserving spaces
+        const chars = this.config.text.split("");
+        
+        chars.forEach((char, index) => {
+          const span = document.createElement("span");
+          
+          // Handle spaces specially - use non-breaking space for proper spacing
+          if (char === " ") {
+            span.innerHTML = "&nbsp;";
+            span.style.whiteSpace = "pre";
+          } else {
+            span.textContent = char;
+          }
+          
+          span.dataset.index = index;
+          headline.appendChild(span);
+        });
+
+        this.spans = headline.querySelectorAll('span');
+      }
+
+      startAnimation() {
+        if (this.isAnimating || !this.spans.length) return;
+        this.isAnimating = true;
+
+        // Use requestAnimationFrame for better performance
+        requestAnimationFrame(() => {
+          this.calculateRevealTiming();
+        });
+      }
+
+      calculateRevealTiming() {
+        const viewportWidth = window.innerWidth;
+        let maxRevealTime = 0;
+        
+        this.spans.forEach((span) => {
+          const rect = span.getBoundingClientRect();
+          const spanCenterX = rect.left + (rect.width / 2);
+          const positionPercent = (spanCenterX / viewportWidth) * 100;
+          const revealTime = (positionPercent / this.config.pathEndPosition) * this.config.animationDuration;
+          maxRevealTime = Math.max(maxRevealTime, Math.max(0, revealTime));
+          
+          setTimeout(() => {
+            span.classList.add('revealed');
+          }, Math.max(0, revealTime));
+        });
+
+        // Fire completion slightly after the last span finishes its fade-in
+        const completionDelayMs = maxRevealTime + 320; // 320ms ~ span transition + buffer
+        if (typeof this.onComplete === 'function') {
+          setTimeout(() => {
+            this.onComplete();
+          }, completionDelayMs);
+        }
+      }
+    }
+
+    // Initialize when DOM is ready
+    function initializeAnimations() {
+      // Set responsive SVG geometry
+      updateArcGeometry();
+      
+      // Read text from HTML element
+      const headlineElement = document.getElementById('headline');
+      const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
+      
+      // Create config with text from HTML
+      const dynamicConfig = {
+        text: textFromHTML,
+        animationDuration: 925,
+        pathEndPosition: 60,
+        transitionDelay: 0
+      };
+      
+      // Add 0.5s delay before starting text animation
+      setTimeout(() => {
+        const heroSubtitle = document.querySelector('.hero-subtitle');
+        const heroTitle = document.querySelector('.hero-title');
+        
+        if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
+        if (heroTitle) {
+          heroTitle.style.opacity = '1';
+          heroTitle.style.visibility = 'visible';
+        }
+
+        const animator = new TextRevealAnimator(dynamicConfig, () => {
+          if (heroSubtitle) heroSubtitle.classList.add('is-visible');
+        });
+        animator.init();
+      }, 500); // 0.5s delay
+    }
+
+    // Performance-optimized DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeAnimations);
+    } else {
+      initializeAnimations();
+    }
+
+    // Handle resize events to update circle path
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        updateArcGeometry();
+      }, 250);
+    });
+
+
+  </script>
+</body>
+</html>
