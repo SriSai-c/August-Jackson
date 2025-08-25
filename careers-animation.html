@@ -51,6 +51,25 @@
       overflow: visible;
     }
 
+    /* Mobile Animation Layer */
+    .animation-bg-mobile {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 425px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .animation-bg-mobile svg {
+      width: 100%;
+      height: 425px;
+      overflow: hidden;
+    }
+
     /* Content Layer */
     .hero-section {
       position: relative;
@@ -110,68 +129,7 @@
       opacity: 1;
     }
 
-    /* SVG Animations */
-    .moving-circle {
-      opacity: 1;
-      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
-      will-change: opacity, offset-distance;
-    }
 
-    /* Desktop specific animation - stops at intersection point */
-    .moving-circle.desktop-path {
-      animation: elementMoveDesktop var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
-    }
-
-    @keyframes elementMoveDesktop {
-      0% {
-        opacity: 1;
-        offset-distance: 0%;
-      }
-      60% {
-        opacity: 1;
-        offset-distance: var(--intersection-point, 60%);
-      }
-      100% {
-        opacity: 1;
-        offset-distance: var(--intersection-point, 60%);
-      }
-    }
-
-
-
-    /* Arc path animation - top-right to bottom-left reveal */
-    .animated-path {
-      stroke-dasharray: var(--path-length, 800); /* Dynamic path length */
-      stroke-dashoffset: var(--path-length, 800);
-      opacity: 0;
-      animation: drawQuarterCircle var(--animation-duration) var(--animation-easing) 0s forwards;
-      will-change: stroke-dashoffset, opacity;
-    }
-
-    @keyframes drawQuarterCircle {
-      0% {
-        stroke-dashoffset: var(--path-length, 800);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      100% {
-        stroke-dashoffset: 0;
-        opacity: 1;
-      }
-    }
-
-    @keyframes elementMove {
-      0% {
-        opacity: 1;
-        offset-distance: 0%;
-      }
-      100% {
-        opacity: 1;
-        offset-distance: 100%;
-      }
-    }
 
     /* Responsive Design */
     @media (max-width: 1200px) {
@@ -204,41 +162,34 @@
         min-height: auto;
       }
       .animation-bg{
-        width: 300px;
-        height: 400px;
-        right: 100px;
-        overflow-x: clip;
-        padding-left: 24px;
-        box-sizing: content-box;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #hero-arc-svg{
+        display: none;
+      }
+      .animation-bg-mobile {
+        display: block;
       }
       
-      /* Smaller circle radius for mobile */
-      .moving-circle {
-        r: 12;
-      }
-      
-      @keyframes elementMove {
-      0% {
-        opacity: 1;
-        offset-distance: 0%;
-      }
-      100% {
-        opacity: 1;
-        offset-distance: 100%;
-      }
-    }
+
     }
 
-    /* Vertical line animation - fade-in from top to bottom */
+
+
+    /* SVG Animations */
+    /* Vertical line animation - fade in and draw from top to bottom */
     .vertical-line {
       stroke-dasharray: 400;
       stroke-dashoffset: 400;
       opacity: 0;
-      animation: fadeInVerticalLine var(--animation-duration) var(--animation-easing) 0s forwards;
+      animation: drawVerticalLine 2s var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
     }
 
-    @keyframes fadeInVerticalLine {
+    @keyframes drawVerticalLine {
       0% {
         stroke-dashoffset: 400;
         opacity: 0;
@@ -252,20 +203,136 @@
       }
     }
 
+    /* Arc path animation - fade in and draw from top-right to bottom-left */
+    .animated-path {
+      stroke-dasharray: var(--path-length, 800);
+      stroke-dashoffset: var(--path-length, 800);
+      opacity: 0;
+      animation: drawArc 2s var(--animation-easing) 0s forwards;
+      will-change: stroke-dashoffset, opacity;
+    }
+
+    @keyframes drawArc {
+      0% {
+        stroke-dashoffset: var(--path-length, 800);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    /* Circle animation - appear at start position, then move along arc */
+    .moving-circle {
+      opacity: 0;
+      animation: appearAndMove 3s var(--animation-easing) 2s forwards;
+      will-change: opacity, offset-distance;
+      offset-path: path('M600,0 C600,67 330,400 0,400');
+      offset-distance: 0%;
+    }
+
+    @keyframes appearAndMove {
+      0% {
+        opacity: 0;
+        offset-distance: 0%;
+      }
+      10% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+      100% {
+        opacity: 1;
+        offset-distance: var(--intersection-point, 60%);
+      }
+    }
+
+    /* Mobile-specific animations */
+    .animation-bg-mobile .vertical-line {
+      stroke-dasharray: 424;
+      stroke-dashoffset: 424;
+      opacity: 0;
+      animation: drawVerticalLineMobile 2s var(--animation-easing) 0s forwards;
+      will-change: stroke-dashoffset, opacity;
+    }
+
+    @keyframes drawVerticalLineMobile {
+      0% {
+        stroke-dashoffset: 424;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    .animation-bg-mobile .animated-path {
+      stroke-dasharray: var(--mobile-path-length, 800);
+      stroke-dashoffset: var(--mobile-path-length, 800);
+      opacity: 0;
+      animation: drawArcMobile 2s var(--animation-easing) 0s forwards;
+      will-change: stroke-dashoffset, opacity;
+    }
+
+    @keyframes drawArcMobile {
+      0% {
+        stroke-dashoffset: var(--mobile-path-length, 800);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    .animation-bg-mobile .moving-circle {
+      opacity: 0;
+      animation: appearAndMoveMobile 3s var(--animation-easing) 2s forwards;
+      will-change: opacity, offset-distance;
+      offset-path: path('M0,120 C207.659,120 376,288.789 376,501');
+      offset-distance: 0%;
+    }
+
+    @keyframes appearAndMoveMobile {
+      0% {
+        opacity: 0;
+        offset-distance: 0%;
+      }
+      10% {
+        opacity: 1;
+        offset-distance: 0%;
+      }
+      100% {
+        opacity: 1;
+        offset-distance: var(--mobile-intersection-point, 42%);
+      }
+    }
+
     /* Performance optimizations */
     .animation-bg,
-    .moving-circle,
-    .vertical-line {
+    .vertical-line,
+    .animated-path,
+    .moving-circle {
       transform: translateZ(0);
       backface-visibility: hidden;
     }
 
     /* Reduced motion support */
     @media (prefers-reduced-motion: reduce) {
-      .moving-circle,
       .animated-text span,
+      .vertical-line,
       .animated-path,
-      .vertical-line {
+      .moving-circle {
         animation-duration: 0.1s;
         transition-duration: 0.1s;
       }
@@ -292,7 +359,7 @@
             
             <!-- Arc path - exact curve from reference SVG, scaled to fit 600x400 -->
           <path id="quarter-circle-path" 
-                d="M600,-156 C600,67 330,400 0,400" 
+                d="M600,0 C600,67 330,400 0,400" 
                 stroke="var(--accent-transparent)" 
                 stroke-width="1" 
                 fill="none" 
@@ -302,10 +369,31 @@
           <circle class="moving-circle" 
                   r="20" 
                   fill="var(--accent-color)" 
-                  cx="600" cy="-156" 
+                  cx="0" cy="0" 
                   vector-effect="non-scaling-stroke" 
-                   style="offset-rotate: 0deg; opacity: 0;"/>
+                   style="offset-rotate: 0deg;"/>
         </svg>
+                 <svg xmlns="http://www.w3.org/2000/svg" width="376" height="425" viewBox="0 0 376 425" fill="none" class="animation-bg-mobile">
+           <!-- Vertical line -->
+           <line class="vertical-line" 
+                 x1="312.5" y1="0" x2="312.5" y2="425" 
+                 stroke="var(--accent-transparent)" 
+                 stroke-width="1" />
+           
+           <!-- Arc path - flipped to start from left-top -->
+           <path class="animated-path" 
+                 d="M0,120 C207.659,120 376,288.789 376,501" 
+                 stroke="var(--accent-transparent)" 
+                 stroke-width="1" 
+                 fill="none" />
+           
+           <!-- Moving circle -->
+           <circle class="moving-circle" 
+                   r="20" 
+                   fill="var(--accent-color)" 
+                   cx="0" cy="120" 
+                   vector-effect="non-scaling-stroke" />
+         </svg>
       </div>
     </div>
     <div class="hero-content">
@@ -325,11 +413,9 @@
 
     // Function to calculate intersection point of cubic bezier curve with vertical line
     function calculateIntersectionPoint() {
-      // For the cubic bezier curve M600,-156 C600,67 330,400 0,400
+      // For the cubic bezier curve M600,0 C600,67 330,400 0,400
       // We need to find where x=400 (vertical line position)
-      // Using numerical approximation for cubic bezier intersection
-      
-      const startX = 600, startY = -156;
+      const startX = 600, startY = 0;
       const cp1X = 600, cp1Y = 67;
       const cp2X = 330, cp2Y = 400;
       const endX = 0, endY = 400;
@@ -341,14 +427,14 @@
       let step = 0.25;
       let iterations = 0;
       
-      while (iterations < 10) {
+      while (iterations < 15) {
         // Calculate point on cubic bezier curve at parameter t
         const x = Math.pow(1-t, 3) * startX + 
                   3 * Math.pow(1-t, 2) * t * cp1X + 
                   3 * (1-t) * Math.pow(t, 2) * cp2X + 
                   Math.pow(t, 3) * endX;
         
-        if (Math.abs(x - targetX) < 1) {
+        if (Math.abs(x - targetX) < 0.5) {
           break;
         }
         
@@ -362,59 +448,123 @@
         iterations++;
       }
       
+      // Calculate the actual point at this t value
+      const finalX = Math.pow(1-t, 3) * startX + 
+                     3 * Math.pow(1-t, 2) * t * cp1X + 
+                     3 * (1-t) * Math.pow(t, 2) * cp2X + 
+                     Math.pow(t, 3) * endX;
+      
+      const finalY = Math.pow(1-t, 3) * startY + 
+                     3 * Math.pow(1-t, 2) * t * cp1Y + 
+                     3 * (1-t) * Math.pow(t, 2) * cp2Y + 
+                     Math.pow(t, 3) * endY;
+      
+      console.log('Desktop intersection found at t:', t, 'Point:', finalX, finalY);
+      
       return Math.max(0, Math.min(1, t));
     }
 
-    // Responsive SVG geometry - circle follows different paths based on screen size
-    function updateArcGeometry() {
-      const svg = document.getElementById('hero-arc-svg');
-      const pathEl = document.getElementById('quarter-circle-path');
-      if (!svg || !pathEl) return;
-
-      // Check if we're below 680px breakpoint
-      const isBelow680px = window.innerWidth <= 680;
-
-      // Fixed 600x400 viewBox
-      svg.setAttribute('viewBox', '0 0 600 400');
-
-      // Fixed arc path - exact curve from reference SVG, scaled to fit 600x400
-      const d = 'M600,-156 C600,67 330,400 0,400';
-      pathEl.setAttribute('d', d);
-
-      // Calculate actual path length
-      const pathLength = pathEl.getTotalLength();
-      document.documentElement.style.setProperty('--path-length', pathLength + 'px');
-
-      // Choose motion path based on screen size
-      let motionPath;
-      if (isBelow680px) {
-        // Below 680px: circle follows vertical line path
-        motionPath = 'path(\'M600,0 L600,400\')';
-      } else {
-        // Above 680px: circle follows complete arc path
-        motionPath = 'path(\'M600,-156 C600,67 330,400 0,400\')';
-      }
-
-      const movingCircle = document.querySelector('.moving-circle');
-      if (movingCircle) {
-        movingCircle.style.offsetPath = motionPath;
+    // Function to calculate mobile intersection point
+    function calculateMobileIntersectionPoint() {
+      // For the mobile cubic bezier curve M0,120 C207.659,120 376,288.789 376,501
+      // We need to find where x=312.5 (vertical line position)
+      const startX = 0, startY = 120;
+      const cp1X = 207.659, cp1Y = 120;
+      const cp2X = 376, cp2Y = 288.789;
+      const endX = 376, endY = 501;
+      
+      const targetX = 312.5;
+      
+      // Binary search to find the t parameter where x=312.5
+      let t = 0.5;
+      let step = 0.25;
+      let iterations = 0;
+      
+      while (iterations < 15) {
+        // Calculate point on cubic bezier curve at parameter t
+        const x = Math.pow(1-t, 3) * startX + 
+                  3 * Math.pow(1-t, 2) * t * cp1X + 
+                  3 * (1-t) * Math.pow(t, 2) * cp2X + 
+                  Math.pow(t, 3) * endX;
         
-        // Calculate the intersection point and set it as CSS custom property
-        if (!isBelow680px) {
-          const intersectionT = calculateIntersectionPoint();
-          const stopPercentage = intersectionT * 100;
-          document.documentElement.style.setProperty('--intersection-point', stopPercentage + '%');
-          movingCircle.classList.add('desktop-path');
-          console.log('Desktop path set:', motionPath, 'Intersection at:', stopPercentage + '%');
-        } else {
-          movingCircle.classList.remove('desktop-path');
-          console.log('Mobile path set:', motionPath);
+        if (Math.abs(x - targetX) < 0.5) {
+          break;
         }
         
-        // Reset offsetDistance to let CSS animation handle the movement
-        movingCircle.style.offsetDistance = '0%';
+        if (x > targetX) {
+          t -= step;
+        } else {
+          t += step;
+        }
+        
+        step *= 0.5;
+        iterations++;
+      }
+      
+      // Calculate the actual point at this t value
+      const finalX = Math.pow(1-t, 3) * startX + 
+                     3 * Math.pow(1-t, 2) * t * cp1X + 
+                     3 * (1-t) * Math.pow(t, 2) * cp2X + 
+                     Math.pow(t, 3) * endX;
+      
+      const finalY = Math.pow(1-t, 3) * startY + 
+                     3 * Math.pow(1-t, 2) * t * cp1Y + 
+                     3 * (1-t) * Math.pow(t, 2) * cp2Y + 
+                     Math.pow(t, 3) * endY;
+      
+      console.log('Mobile intersection found at t:', t, 'Point:', finalX, finalY);
+      
+      return Math.max(0, Math.min(1, t));
+    }
+
+    // Function to setup SVG animations
+    function setupSVGAnimations() {
+      // Setup desktop animations
+      const pathEl = document.getElementById('quarter-circle-path');
+      if (pathEl) {
+        // Calculate actual path length
+        const pathLength = pathEl.getTotalLength();
+        document.documentElement.style.setProperty('--path-length', pathLength + 'px');
+
+        // Calculate intersection point
+        const intersectionT = calculateIntersectionPoint();
+        let stopPercentage = intersectionT * 100;
+        
+        // If the calculated percentage seems too small, use a reasonable fallback
+        if (stopPercentage < 5) {
+          console.log('Desktop intersection percentage too small, using fallback');
+          stopPercentage = 42; // Exact intersection point
+        }
+        
+        document.documentElement.style.setProperty('--intersection-point', stopPercentage + '%');
+        
+        console.log('Desktop arc path length:', pathLength, 'Intersection at:', stopPercentage + '%');
+      }
+
+      // Setup mobile animations
+      const mobilePathEl = document.querySelector('.animation-bg-mobile .animated-path');
+      if (mobilePathEl) {
+        // Calculate actual mobile path length
+        const mobilePathLength = mobilePathEl.getTotalLength();
+        document.documentElement.style.setProperty('--mobile-path-length', mobilePathLength + 'px');
+
+        // Calculate mobile intersection point
+        const mobileIntersectionT = calculateMobileIntersectionPoint();
+        let mobileStopPercentage = mobileIntersectionT * 100;
+        
+        // If the calculated percentage seems too small, use a reasonable fallback
+        if (mobileStopPercentage < 5) {
+          console.log('Mobile intersection percentage too small, using fallback');
+          mobileStopPercentage = 42; // Approximate intersection point
+        }
+        
+        document.documentElement.style.setProperty('--mobile-intersection-point', mobileStopPercentage + '%');
+        
+        console.log('Mobile arc path length:', mobilePathLength, 'Intersection at:', mobileStopPercentage + '%');
       }
     }
+
+
 
     // Optimized text reveal animation
     class TextRevealAnimator {
@@ -495,8 +645,8 @@
 
     // Initialize when DOM is ready
     function initializeAnimations() {
-      // Set responsive SVG geometry
-      updateArcGeometry();
+      // Setup SVG animations first
+      setupSVGAnimations();
       
       // Read text from HTML element
       const headlineElement = document.getElementById('headline');
@@ -535,14 +685,7 @@
       initializeAnimations();
     }
 
-    // Handle resize events to update circle path
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        updateArcGeometry();
-      }, 250);
-    });
+
 
 
   </script>
