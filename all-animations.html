@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>All Animations - August Jackson</title>
+
+  <style>
+    /* Page layout helpers (scoped to page only) */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    .aj-page-section {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    /* Ensure right-edge arcs are fully visible/aligned on desktop */
+    .aj-page-section.aj-qc,
+    .aj-page-section.aj-qco,
+    .aj-page-section.aj-semi {
+      overflow: visible;
+    }
+  </style>
+
+  <!-- ARTICLE ANIMATION (namespaced: aj-article) -->
+  <style>
+    .aj-article {
+      --primary-bg: #ffffff;
+      --text-primary: #000000;
+      --text-secondary: #666666;
+      --accent-color: #00B3B2;
+      --accent-transparent: #D4D4D4;
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 80%;
+      --intersection-point: 63.8%;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+    }
+    .aj-article * { box-sizing: border-box; }
+    .aj-article .animation-bg {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: visible;
+      width: 600px;
+      height: 420px;
+    }
+    .aj-article .animation-bg svg { width: 600px; height: 420px; overflow: visible; }
+    .aj-article .hero-section {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      width: 100%;
+      min-height: 400px;
+      min-height: auto;
+      padding: 0 80px 80px 80px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    .aj-article .hero-subtitle { max-width: 800px; }
+    .aj-article .hero-title {
+      font-size: clamp(36px, 5vw, 72px);
+      font-weight: 900;
+      line-height: 0.9;
+      margin-bottom: 40px;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+    .aj-article .hero-subtitle {
+      font-size: clamp(15px, 1.2vw, 18px);
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 540px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+    .aj-article .hero-fade-in { opacity: 0; transform: translateY(8px); transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing); }
+    .aj-article .hero-fade-in.is-visible { opacity: 1; transform: translateY(0); }
+    .aj-article .moving-circle { opacity: 1; animation: article-elementMove 1.5s var(--animation-easing) 1s forwards; will-change: opacity, offset-distance; }
+    .aj-article .animated-path {
+      stroke-dasharray: var(--path-length, 600);
+      stroke-dashoffset: var(--path-length, 600);
+      opacity: 0;
+      animation: article-drawQuarterCircle 1s var(--animation-easing) 0s forwards;
+      will-change: stroke-dashoffset, opacity;
+    }
+    @keyframes article-drawQuarterCircle {
+      0% { stroke-dashoffset: var(--path-length, 600); opacity: 0; }
+      10% { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+    @keyframes article-elementMove {
+      0% { opacity: 1; offset-distance: 0%; }
+      100% { opacity: 1; offset-distance: var(--intersection-point, 63.8%); }
+    }
+    .aj-article .vertical-line {
+      stroke-dasharray: 433; stroke-dashoffset: 433; opacity: 0;
+      animation: article-fadeInVerticalLine 1s var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity;
+    }
+    @keyframes article-fadeInVerticalLine {
+      0% { stroke-dashoffset: 433; opacity: 0; }
+      10% { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+    .aj-article .animation-bg, .aj-article .moving-circle, .aj-article .vertical-line { transform: translateZ(0); backface-visibility: hidden; }
+    @media (max-width: 1200px) { .aj-article .hero-section { padding: 0 60px 60px 60px; } }
+    @media (max-width: 768px) {
+      .aj-article .hero-section { padding: 0 40px 40px 40px; }
+      .aj-article .hero-title { margin-bottom: 30px; }
+      .aj-article .hero-subtitle { max-width: 100%; }
+    }
+    @media (max-width: 680px) {
+      .aj-article .hero-section { padding: 160px 24px 40px 24px; min-height: 400px; }
+      .aj-article .animation-bg { width: 180px; height: 120px; right: 0; }
+      .aj-article .animation-bg svg { width: 100%; height: 100%; }
+      .aj-article .moving-circle { r: 40; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .aj-article .moving-circle, .aj-article .animated-text span, .aj-article .animated-path, .aj-article .vertical-line { animation-duration: 0.1s; transition-duration: 0.1s; }
+      .aj-article .hero-subtitle { transition-duration: 0.1s; }
+    }
+  </style>
+
+  <!-- CAREERS ANIMATION (namespaced: aj-careers) -->
+  <style>
+    .aj-careers {
+      --primary-bg: #ffffff;
+      --text-primary: #111111;
+      --text-secondary: #111111;
+      --accent-color: #00B3B2;
+      --accent-transparent: #D4D4D4;
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 80%;
+      --intersection-point: 60%;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+    }
+    .aj-careers .animation-bg { position: absolute; top: 0; right: 200px; z-index: 0; pointer-events: none; overflow: visible; width: 600px; height: 400px; }
+    .aj-careers .animation-bg svg { width: 600px; height: 400px; overflow: visible; }
+    .aj-careers .hero-section { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: flex-start; width: 100%; height: 400px; min-height: auto; padding: 0 80px 80px 80px; margin: 0 auto; max-width: 1440px; box-sizing: border-box;}
+    .aj-careers .hero-title { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 0.9; margin-bottom: 40px; letter-spacing: -0.02em; text-transform: uppercase; color: var(--text-primary); }
+    .aj-careers .hero-subtitle { font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; color: var(--text-secondary); max-width: 540px; font-weight: 400; letter-spacing: 0.03em; }
+    .aj-careers .hero-fade-in { opacity: 0; transform: translateY(8px); transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing); }
+    .aj-careers .hero-fade-in.is-visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 1200px) { .aj-careers .hero-section { padding: 0 60px 60px 60px; } }
+    @media (max-width: 980px) {
+      .aj-careers .hero-section { padding: 0 40px 40px 40px; }
+      .aj-careers .hero-title { margin-bottom: 30px; }
+      .aj-careers .hero-subtitle { max-width: 100%; }
+      .aj-careers .animation-bg { right: 0; }
+    }
+    @media (max-width: 424px) {
+      .aj-careers { --path-end-position: 80%; }
+      .aj-careers .hero-section { padding: 0 24px 40px 24px; height: 100%; min-height: 424px; }
+      .aj-careers .animation-bg { width: 100%; height: 100%; }
+      .aj-careers .animation-bg svg { width: 100%; height: 100%; }
+      .aj-careers .animation-bg .vertical-line { animation: careers-drawVerticalLineMobile 1s var(--animation-easing) 0s forwards; stroke-dasharray: var(--mobile-line-length, 400); }
+      .aj-careers .animation-bg .animated-path { animation: careers-drawArcMobile 1s var(--animation-easing) 0s forwards; stroke-dasharray: var(--mobile-path-length, 800); }
+      .aj-careers .animation-bg .moving-circle { animation: careers-appearAndMoveMobile 1.5s var(--animation-easing) 1s forwards; }
+    }
+    .aj-careers .vertical-line { stroke-dasharray: 400; stroke-dashoffset: 400; opacity: 0; animation: careers-drawVerticalLine 1s var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity; }
+    @keyframes careers-drawVerticalLine { 0% { stroke-dashoffset: 400; opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    .aj-careers .animated-path { stroke-dasharray: var(--path-length, 800); stroke-dashoffset: var(--path-length, 800); opacity: 0; animation: careers-drawArc 1s var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity; }
+    @keyframes careers-drawArc { 0% { stroke-dashoffset: var(--path-length, 800); opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    .aj-careers .moving-circle { opacity: 0; animation: careers-appearAndMove 1.5s var(--animation-easing) .5s forwards; will-change: opacity, offset-distance; offset-path: path('M600,0 C600,67 330,400 0,400'); offset-distance: 0%; }
+    @keyframes careers-appearAndMove { 0% { opacity: 0; offset-distance: 0%; } 10% { opacity: 1; offset-distance: 0%; } 100% { opacity: 1; offset-distance: var(--intersection-point, 60%); } }
+    @keyframes careers-drawVerticalLineMobile { 0% { stroke-dashoffset: var(--mobile-line-length, 800); opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes careers-drawArcMobile { 0% { stroke-dashoffset: var(--mobile-path-length, 800); opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes careers-appearAndMoveMobile { 0% { opacity: 0; offset-distance: 0%; } 10% { opacity: 1; offset-distance: 0%; } 100% { opacity: 1; offset-distance: var(--mobile-intersection-point, 42%); } }
+    .aj-careers .animation-bg, .aj-careers .vertical-line, .aj-careers .animated-path, .aj-careers .moving-circle { backface-visibility: hidden; }
+    @media (prefers-reduced-motion: reduce) {
+      .aj-careers .animated-text span, .aj-careers .vertical-line, .aj-careers .animated-path, .aj-careers .moving-circle { animation-duration: 0.1s; transition-duration: 0.1s; }
+      .aj-careers .hero-subtitle { transition-duration: 0.1s; }
+    }
+  </style>
+
+  <!-- HERO ANIMATION (namespaced: aj-hero) -->
+  <style>
+    .aj-hero {
+      --primary-bg: #111111;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --accent-color: #00B3B2;
+      --accent-transparent: #30363D;
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 65%;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+    }
+    .aj-hero .animation-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: visible; }
+    .aj-hero .animation-bg svg { width: 100%; height: 100%; }
+    .aj-hero .hero-section { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: flex-start; width: 100%; height: 100vh; min-height: auto; padding: 0 80px 80px 80px; margin: 0 auto;box-sizing: border-box; }
+    .aj-hero .hero-subtitle { max-width: 700px; }
+    .aj-hero .hero-title { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 0.9; margin-bottom: 40px; letter-spacing: -0.02em; text-transform: uppercase; color: var(--text-primary); opacity: 0; visibility: hidden; }
+    .aj-hero .hero-subtitle { font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; color: var(--text-secondary); max-width: 540px; font-weight: 400; letter-spacing: 0.03em; opacity: 0; transform: translateY(8px); transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing); }
+    .aj-hero .hero-subtitle.is-visible { opacity: 1; transform: translateY(0); }
+    .aj-hero .animated-text span { opacity: 0; display: inline-block; transition: opacity 0.3s var(--animation-easing); will-change: opacity; }
+    .aj-hero .animated-text span.revealed { opacity: 1; }
+    .aj-hero .moving-circle { opacity: 0; animation: hero-elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards; will-change: opacity, offset-distance; }
+    .aj-hero .moving-vertical-line { opacity: 0; animation: hero-elementMove var(--animation-duration) var(--animation-easing) 0s forwards; will-change: opacity, offset-distance; }
+    .aj-hero .animated-path { stroke-dasharray: var(--path-length, 350); opacity: 0; animation: hero-drawSemicircle var(--animation-duration) var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity; }
+    @keyframes hero-drawSemicircle { 0% { stroke-dashoffset: -350; opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes hero-elementMove { 0% { opacity: 1; offset-distance: 0%; } 80% { opacity: 1; offset-distance: var(--path-end-position); } 100% { opacity: 1; offset-distance: var(--path-end-position); } }
+    @media (max-width: 1200px) { .aj-hero .hero-section { padding: 0 60px 60px 60px; } }
+    @media (max-width: 768px) { .aj-hero .hero-section { padding: 0 40px 40px 40px; } .aj-hero .hero-title { margin-bottom: 30px; } .aj-hero .hero-subtitle { max-width: 100%; } }
+    @media (max-width: 680px) { .aj-hero { --path-end-position: 80%; } .aj-hero .hero-section { padding: 0 24px 40px 24px; height: 600px; min-height: auto; } #heroanim-arc-svg { max-height: 300px; overflow: visible; } }
+    .aj-hero .animation-bg, .aj-hero .moving-circle, .aj-hero .moving-vertical-line { transform: translateZ(0); backface-visibility: hidden; }
+    @media (prefers-reduced-motion: reduce) { .aj-hero .moving-circle, .aj-hero .moving-vertical-line, .aj-hero .animated-text span, .aj-hero .animated-path { animation-duration: 0.1s; transition-duration: 0.1s; } .aj-hero .hero-subtitle { transition-duration: 0.1s; } }
+  </style>
+
+  <!-- QUARTER CIRCLE (responsive path swap) (namespaced: aj-qc) -->
+  <style>
+    .aj-qc {
+      --primary-bg: #ffffff;
+      --text-primary: #000000;
+      --text-secondary: #666666;
+      --accent-color: #00B3B2;
+      --accent-transparent: #D4D4D4;
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 80%;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+    }
+    .aj-qc .animation-bg { position: absolute; top: 0; right: 0; z-index: 0; pointer-events: none; overflow: visible; width: 400px; height: 400px; }
+    .aj-qc .animation-bg svg { width: 400px; height: 400px; overflow: visible; }
+    .aj-qc .hero-section { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: flex-start; width: 100%; height: 400px; min-height: auto; padding: 0 80px 80px 80px; margin: 0 auto;box-sizing: border-box; }
+    .aj-qc .hero-title { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 0.9; margin-bottom: 40px; letter-spacing: -0.02em; text-transform: uppercase; color: var(--text-primary); }
+    .aj-qc .hero-subtitle { font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; color: var(--text-secondary); max-width: 540px; font-weight: 400; letter-spacing: 0.03em; }
+    .aj-qc .hero-fade-in { opacity: 0; transform: translateY(8px); transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing); }
+    .aj-qc .hero-fade-in.is-visible { opacity: 1; transform: translateY(0); }
+    .aj-qc .moving-circle { opacity: 0; animation: qc-elementMove 1.5s var(--animation-easing) 1s forwards; will-change: opacity, offset-distance; }
+    .aj-qc .animated-path { stroke-dasharray: 628; stroke-dashoffset: 628; opacity: 0; animation: qc-drawQuarterCircle 1s var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity; }
+    @keyframes qc-drawQuarterCircle { 0% { stroke-dashoffset: 628; opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes qc-elementMove { 0% { opacity: 1; offset-distance: 0%; } 80% { opacity: 1; offset-distance: calc(var(--path-end-position) + 10%); } 100% { opacity: 1; offset-distance: calc(var(--path-end-position) + 10%); } }
+    @media (max-width: 1200px) { .aj-qc .hero-section { padding: 0 60px 60px 60px; } }
+    @media (max-width: 768px) { .aj-qc .hero-section { padding: 0 40px 40px 40px; } .aj-qc .hero-title { margin-bottom: 30px; } .aj-qc .hero-subtitle { max-width: 100%; } }
+    @media (max-width: 680px) {
+      .aj-qc { --path-end-position: 80%; }
+      .aj-qc .hero-section { padding: 0 24px 40px 24px; height: 400px; min-height: auto; }
+      .aj-qc .animation-bg { width: 64px; overflow-x: clip; padding-left: 24px; box-sizing: content-box; }
+      .aj-qc .moving-circle { r: 12; }
+      @keyframes qc-elementMove { 0% { opacity: 1; offset-distance: 0%; } 80% { opacity: 1; offset-distance: 100%; } 100% { opacity: 1; offset-distance: 100%; } }
+    }
+    .aj-qc .vertical-line { stroke-dasharray: 400; stroke-dashoffset: 400; opacity: 0; animation: qc-fadeInVerticalLine 1s var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity; }
+    @keyframes qc-fadeInVerticalLine { 0% { stroke-dashoffset: 400; opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    .aj-qc .animation-bg, .aj-qc .moving-circle, .aj-qc .vertical-line { transform: translateZ(0); backface-visibility: hidden; }
+    @media (prefers-reduced-motion: reduce) { .aj-qc .moving-circle, .aj-qc .animated-text span, .aj-qc .animated-path, .aj-qc .vertical-line { animation-duration: 0.1s; transition-duration: 0.1s; } .aj-qc .hero-subtitle { transition-duration: 0.1s; } }
+  </style>
+
+  <!-- QUARTER CIRCLE ONLY (namespaced: aj-qco) -->
+  <style>
+    .aj-qco {
+      --primary-bg: #111111;
+      --text-primary: #FFFFFF;
+      --text-secondary: #666666;
+      --accent-color: #00B3B2;
+      --accent-transparent: #30363D;
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 80%;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+    }
+    .aj-qco .animation-bg { position: absolute; top: 0; right: 0; z-index: 0; pointer-events: none; overflow: visible; width: 400px; height: 400px; }
+    .aj-qco .animation-bg svg { width: 400px; height: 400px; overflow: visible; }
+    .aj-qco .hero-section { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: flex-start; width: 100%; height: 400px; min-height: auto; padding: 0 80px 80px 80px; margin: 0 auto;box-sizing: border-box; }
+    .aj-qco .hero-title { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 0.9; margin-bottom: 40px; letter-spacing: -0.02em; text-transform: uppercase; color: var(--text-primary); }
+    .aj-qco .hero-subtitle { font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; color: var(--text-secondary); font-weight: 400; letter-spacing: 0.03em; }
+    .aj-qco .hero-fade-in { opacity: 0; transform: translateY(8px); transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing); }
+    .aj-qco .hero-fade-in.is-visible { opacity: 1; transform: translateY(0); }
+    .aj-qco .moving-circle { opacity: 0; animation: qco-elementMove 1.5s var(--animation-easing) 1s forwards; will-change: opacity, offset-distance; }
+    .aj-qco .animated-path { stroke-dasharray: 628; stroke-dashoffset: 628; opacity: 0; animation: qco-drawQuarterCircle 1s var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity; }
+    @keyframes qco-drawQuarterCircle { 0% { stroke-dashoffset: 628; opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes qco-elementMove { 0% { opacity: 1; offset-distance: 0%; } 80% { opacity: 1; offset-distance: 50%; } 100% { opacity: 1; offset-distance: 50%; } }
+    @media (max-width: 1200px) { .aj-qco .hero-section { padding: 0 60px 60px 60px; } }
+    @media (max-width: 768px) { .aj-qco .hero-section { padding: 0 40px 40px 40px; } .aj-qco .hero-title { margin-bottom: 30px; } .aj-qco .hero-subtitle { max-width: 100%; } }
+    @media (max-width: 680px) { .aj-qco { --path-end-position: 80%; } .aj-qco .hero-section { padding: 0 24px 40px 24px; height: 400px; min-height: auto; } .aj-qco .animation-bg { width: 160px; overflow-x: clip; padding-left: 24px; box-sizing: content-box; } .aj-qco .moving-circle { r: 12; } @keyframes qco-elementMove { 0% { opacity: 1; offset-distance: 0%; } 80% { opacity: 1; offset-distance: 25%; } 100% { opacity: 1; offset-distance: 25%; } } }
+    .aj-qco .animation-bg, .aj-qco .moving-circle { transform: translateZ(0); backface-visibility: hidden; }
+    @media (prefers-reduced-motion: reduce) { .aj-qco .moving-circle, .aj-qco .animated-text span, .aj-qco .animated-path { animation-duration: 0.1s; transition-duration: 0.1s; } .aj-qco .hero-subtitle { transition-duration: 0.1s; } }
+  </style>
+
+  <!-- SEMI CIRCLE ONLY (namespaced: aj-semi) -->
+  <style>
+    .aj-semi {
+      --primary-bg: #111111;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --accent-color: #00B3B2;
+      --accent-transparent: #30363D;
+      --animation-duration: 3s;
+      --animation-easing: cubic-bezier(0.4,0,0.2,1);
+      --path-end-position: 65%;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+    }
+    .aj-semi .animation-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: visible; bottom: -150px; }
+    .aj-semi .animation-bg svg { width: 100%; height: 100%; }
+    .aj-semi .hero-section { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: flex-start; width: 100%; height: 550px; min-height: auto; padding: 0 80px 80px 80px; margin: 0 auto;box-sizing: border-box; }
+    .aj-semi .hero-subtitle { max-width: 700px; }
+    .aj-semi .hero-title { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 0.9; margin-bottom: 40px; letter-spacing: -0.02em; text-transform: uppercase; color: var(--text-primary); }
+    .aj-semi .hero-subtitle { font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; color: var(--text-secondary); max-width: 540px; font-weight: 400; letter-spacing: 0.03em; }
+    .aj-semi .hero-fade-in { opacity: 0; transform: translateY(8px); transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing); }
+    .aj-semi .hero-fade-in.is-visible { opacity: 1; transform: translateY(0); }
+    .aj-semi .moving-circle { opacity: 0; animation: semi-elementMove 1.5s var(--animation-easing) 1s forwards; will-change: opacity, offset-distance; }
+    .aj-semi .animated-path { stroke-dasharray: var(--path-length, 350); opacity: 0; animation: semi-drawSemicircle 1s var(--animation-easing) 0s forwards; will-change: stroke-dashoffset, opacity; }
+    @keyframes semi-drawSemicircle { 0% { stroke-dashoffset: -350; opacity: 0; } 10% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes semi-elementMove { 0% { opacity: 1; offset-distance: 0%; } 80% { opacity: 1; offset-distance: var(--path-end-position); } 100% { opacity: 1; offset-distance: var(--path-end-position); } }
+    @media (max-width: 1200px) { .aj-semi .hero-section { padding: 0 60px 60px 60px; } }
+    @media (max-width: 768px) { .aj-semi .hero-section { padding: 0 40px 40px 40px; } .aj-semi .hero-title { margin-bottom: 30px; } .aj-semi .hero-subtitle { max-width: 100%; } }
+    @media (max-width: 680px) { .aj-semi { --path-end-position: 80%; } .aj-semi .hero-section { padding: 0 24px 40px 24px; height: 400px; min-height: auto; } .aj-semi .animation-bg { bottom: 0; } #semi-arc-svg { max-height: 180px; overflow: visible; } .aj-semi .moving-circle { r: 7; } .aj-semi #semi-semicircle-path {transform: scaleX(102%) translateX(-1%);} }
+    .aj-semi .animation-bg, .aj-semi .moving-circle { transform: translateZ(0); backface-visibility: hidden; }
+    @media (prefers-reduced-motion: reduce) { .aj-semi .moving-circle, .aj-semi .animated-text span, .aj-semi .animated-path { animation-duration: 0.1s; transition-duration: 0.1s; } .aj-semi .hero-subtitle { transition-duration: 0.1s; } }
+    .aj-semi .circle-svg-container { position: absolute; width: 12px; height: 12px; z-index: 1; offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; animation: semi-elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards; will-change: opacity, offset-distance; opacity: 0; transform: translate(-50%, -50%); }
+    .aj-semi .circle-svg-container svg { width: 100%; height: 100%; }
+    .aj-semi .separate-circle { fill: var(--accent-color); }
+  </style>
+
+</head>
+<body>
+
+  <!-- ARTICLE SECTION -->
+  <section class="aj-page-section aj-article">
+    <main class="hero-section">
+      <div class="animation-container">
+        <div class="animation-bg">
+          <svg id="article-hero-arc-svg" viewBox="0 0 600 450" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <line class="vertical-line" x1="400" y1="0" x2="400" y2="433" stroke="var(--accent-transparent)" stroke-width="1" />
+            <path id="article-quarter-circle-path" d="M0,0 C0,242.721 189.384,433 423,433 L423,433 C656.616,433 846,242.721 846,0" stroke="var(--accent-transparent)" stroke-width="1" fill="none" class="animated-path" />
+            <circle class="moving-circle" r="20" fill="var(--accent-color)" cx="0" cy="0" vector-effect="non-scaling-stroke" style="offset-rotate: 0deg; opacity: 0;"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-content">
+        <h1 class="hero-title hero-fade-in">Written by Author name, Title</h1>
+        <p class="hero-subtitle hero-fade-in">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pretium ipsum ut tortor tempor suscipit. Duis tempor eros massa, a congue justo scelerisque non. Morbi efficitur tortor vitae felis ultrices ultrices. Suspendisse viverra pellentesque nisl. Nam augue neque, congue a elit sed, consectetur fringilla lectus. Morbi mauris augue, vehicula ultrices neque ac, venenatis cursus massa. Etiam non quam turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pretium ipsum ut tortor tempor suscipit. Duis tempor eros massa, a congue justo scelerisque non. Morbi efficitur tortor vitae felis ultrices ultrices. Suspendisse viverra pellentesque nisl. Nam augue neque, congue a elit sed, consectetur fringilla lectus. Morbi mauris augue, vehicula ultrices neque ac, venenatis cursus massa. Etiam non quam turpis.</p>
+      </div>
+    </main>
+  </section>
+
+  <!-- CAREERS SECTION -->
+  <section class="aj-page-section aj-careers">
+    <main class="hero-section">
+      <div class="animation-container">
+        <div class="animation-bg">
+          <svg id="careers-hero-arc-svg" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <line class="vertical-line" x1="400" y1="0" x2="400" y2="400" stroke="var(--accent-transparent)" stroke-width="1" />
+            <path id="careers-quarter-circle-path" d="M600,0 C600,67 330,400 0,400" stroke="var(--accent-transparent)" stroke-width="1" fill="none" class="animated-path" />
+            <circle class="moving-circle" r="20" fill="var(--accent-color)" cx="0" cy="0" vector-effect="non-scaling-stroke" style="offset-rotate: 0deg;"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-content">
+        <h1 class="hero-title hero-fade-in">Join us</h1>
+        <p class="hero-subtitle hero-fade-in">If you're ready to help shape experiences that move people we'd love to meet you.</p>
+      </div>
+    </main>
+  </section>
+
+  <!-- HERO SECTION (dark) -->
+  <section class="aj-page-section aj-hero">
+    <main class="hero-section">
+      <div class="animation-container">
+        <div class="animation-bg">
+          <svg id="heroanim-arc-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path id="heroanim-semicircle-path" d="M 0 0 A 50 100 0 0 0 100 0" stroke="var(--accent-transparent)" stroke-width="0.25" fill="none" class="animated-path" />
+            <line class="moving-vertical-line" x1="0" y1="-150" x2="0" y2="150" stroke="var(--accent-transparent)" stroke-width="0.25" style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg;"/>
+            <circle class="moving-circle" r="4" fill="var(--accent-color)" cx="0" cy="0" vector-effect="non-scaling-stroke" style="offset-path: path('M 0 0 A 50 100 0 0 0 100 0'); offset-distance: 0%; offset-rotate: 0deg; opacity: 0;"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-content">
+        <h1 id="heroanim-headline" class="hero-title animated-text" aria-label="August Jackson">August Jackson</h1>
+        <p class="hero-subtitle">A global creative agency specializing in high-impact event experiences and strategic communications.</p>
+      </div>
+    </main>
+  </section>
+
+  <!-- QUARTER CIRCLE (responsive path) SECTION -->
+  <section class="aj-page-section aj-qc">
+    <main class="hero-section">
+      <div class="animation-container">
+        <div class="animation-bg">
+          <svg id="qc-hero-arc-svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <line class="vertical-line" x1="0" y1="0" x2="0" y2="400" stroke="var(--accent-transparent)" stroke-width="0.5" />
+            <path id="qc-quarter-circle-path" d="M0,0 A400,400 0 0,0 400,400" stroke="var(--accent-transparent)" stroke-width="0.5" fill="none" class="animated-path" />
+            <circle class="moving-circle" r="20" fill="var(--accent-color)" cx="0" cy="0" vector-effect="non-scaling-stroke" style="offset-distance: 0; offset-rotate: 0deg; opacity: 0;"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-content">
+        <h1 class="hero-title hero-fade-in" aria-label="About Us">About us</h1>
+        <p class="hero-subtitle hero-fade-in">AJ is a creative agency specializing in signature events and stakeholder communications.</p>
+      </div>
+    </main>
+  </section>
+
+  <!-- QUARTER CIRCLE ONLY SECTION -->
+  <section class="aj-page-section aj-qco">
+    <main class="hero-section">
+      <div class="animation-container">
+        <div class="animation-bg">
+          <svg id="qco-hero-arc-svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path id="qco-quarter-circle-path" d="M0,0 A400,400 0 0,0 400,400" stroke="var(--accent-transparent)" stroke-width="1" fill="none" class="animated-path" />
+            <circle class="moving-circle" r="20" fill="var(--accent-color)" cx="0" cy="0" vector-effect="non-scaling-stroke" style="offset-distance: 0; offset-rotate: 0deg; opacity: 0;"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-content">
+        <h1 class="hero-title hero-fade-in" aria-label="Our Work">Our Work</h1>
+        <p class="hero-subtitle hero-fade-in">Discover how AJ helps leading organizations energize, align, and inspire stakeholders to achieve lasting impact.</p>
+      </div>
+    </main>
+  </section>
+
+  <!-- SEMI CIRCLE ONLY SECTION -->
+  <section class="aj-page-section aj-semi">
+    <main class="hero-section">
+      <div class="animation-container">
+        <div class="animation-bg">
+          <svg id="semi-arc-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path id="semi-semicircle-path" d="M 0 100 A 50 100 0 0 1 100 100" stroke="var(--accent-transparent)" stroke-width="0.5" fill="none" class="animated-path" />
+            <circle class="moving-circle" r="4" fill="var(--accent-color)" cx="0" cy="0" vector-effect="non-scaling-stroke" style="offset-distance: 0%; offset-rotate: 0deg; opacity: 0;"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-content">
+        <p class="hero-subtitle hero-fade-in">Reimagining Executive Summits to Drive Engagement and Innovation at Scale</p>
+      </div>
+    </main>
+  </section>
+
+  <script>
+    /* ARTICLE scripts (scoped) */
+    (function(){
+      if (!document.querySelector('.aj-article')) return;
+      function articleUpdateArcGeometry() {
+        const svg = document.getElementById('article-hero-arc-svg');
+        const pathEl = document.getElementById('article-quarter-circle-path');
+        if (!svg || !pathEl) return;
+        svg.setAttribute('viewBox', '0 0 600 450');
+        const d = 'M0,0 C0,242.721 189.384,433 423,433 L423,433 C656.616,433 846,242.721 846,0';
+        pathEl.setAttribute('d', d);
+        const verticalLine = svg.querySelector('.vertical-line');
+        if (verticalLine) {
+          verticalLine.setAttribute('x1', '400');
+          verticalLine.setAttribute('x2', '400');
+          verticalLine.setAttribute('y1', '0');
+          verticalLine.setAttribute('y2', '433');
+        }
+        const pathLength = pathEl.getTotalLength();
+        const root = svg.closest('.aj-article');
+        if (root) {
+          root.style.setProperty('--path-length', pathLength + 'px');
+        }
+        const motionPath = "path('M0,0 C0,242.721 189.384,433 423,433 L423,433 C656.616,433 400,200 400,200')";
+        const movingCircle = svg.querySelector('.moving-circle');
+        if (movingCircle) {
+          movingCircle.style.offsetPath = motionPath;
+          const intersectionPercentage = 63.8;
+          if (root) {
+            root.style.setProperty('--intersection-point', intersectionPercentage + '%');
+          }
+          movingCircle.style.offsetDistance = '0%';
+          movingCircle.setAttribute('cx', '0');
+          movingCircle.setAttribute('cy', '0');
+        }
+      }
+      function articleInitialize() {
+        articleUpdateArcGeometry();
+        setTimeout(() => {
+          const container = document.querySelector('.aj-article');
+          const heroTitle = container && container.querySelector('.hero-title');
+          const heroSubtitle = container && container.querySelector('.hero-subtitle');
+          if (heroTitle) heroTitle.classList.add('is-visible');
+          setTimeout(() => { if (heroSubtitle) heroSubtitle.classList.add('is-visible'); }, 300);
+        }, 500);
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', articleInitialize); } else { articleInitialize(); }
+      let articleResizeTimeout; window.addEventListener('resize', () => { clearTimeout(articleResizeTimeout); articleResizeTimeout = setTimeout(articleUpdateArcGeometry, 250); });
+    })();
+
+    /* CAREERS scripts (scoped) */
+    (function(){
+      if (!document.querySelector('.aj-careers')) return;
+      function calculateIntersectionPoint() {
+        if (window.innerWidth > 424) return 0.42;
+        const startX = 600, startY = 0; const cp1X = 600, cp1Y = 67; const cp2X = 330, cp2Y = 400; const endX = 0, endY = 400;
+        let targetX = 400; const isMobile = window.innerWidth <= 600; if (isMobile) targetX = 600 * 0.8;
+        let t = 0.5, step = 0.25, iterations = 0;
+        while (iterations < 15) {
+          const x = Math.pow(1-t, 3) * startX + 3 * Math.pow(1-t, 2) * t * cp1X + 3 * (1-t) * Math.pow(t, 2) * cp2X + Math.pow(t, 3) * endX;
+          if (Math.abs(x - targetX) < 0.5) { break; }
+          if (x > targetX) { t -= step; } else { t += step; }
+          step *= 0.5; iterations++;
+        }
+        return Math.max(0, Math.min(1, t));
+      }
+      function calculateMobileIntersectionPoint() {
+        const container = document.querySelector('.aj-careers .hero-section');
+        const containerWidth = container ? container.offsetWidth : 0;
+        const containerHeight = container ? container.offsetHeight : 0;
+        const radius = containerWidth; const centerX = 0; const centerY = containerHeight; const lineX = containerWidth * 0.8;
+        const xDiff = lineX - centerX; const yDiffSquared = radius * radius - xDiff * xDiff; if (yDiffSquared < 0) { return 0.42; }
+        const yDiff = Math.sqrt(yDiffSquared); const intersectionY = centerY - yDiff; const angle = Math.atan2(intersectionY - centerY, lineX - centerX);
+        const anglePercent = (angle + Math.PI/2) / (Math.PI/2); return Math.max(0, Math.min(1, anglePercent));
+      }
+      function setupSVGAnimations() {
+        const pathEl = document.getElementById('careers-quarter-circle-path');
+        const svgEl = document.getElementById('careers-hero-arc-svg');
+        if (pathEl) {
+          if (window.innerWidth <= 424) {
+            const container = document.querySelector('.aj-careers .hero-section');
+            const containerWidth = container ? container.offsetWidth : 600;
+            const containerHeight = container ? container.offsetHeight : 400;
+            const radius = containerWidth; const startY = containerHeight - radius; const endX = radius; const endY = containerHeight;
+            const quarterCirclePath = `M0,${startY} A${radius},${radius} 0 0 1 ${endX},${endY}`;
+            pathEl.setAttribute('d', quarterCirclePath);
+            if (svgEl) { svgEl.setAttribute('viewBox', `0 0 ${containerWidth} ${containerHeight}`); }
+            const root = svgEl ? svgEl.closest('.aj-careers') : document.querySelector('.aj-careers');
+            const mobilePathLength = pathEl.getTotalLength(); if (root) { root.style.setProperty('--mobile-path-length', mobilePathLength + 'px'); root.style.setProperty('--mobile-line-length', containerHeight + 'px'); }
+            const mobileIntersectionT = calculateMobileIntersectionPoint(); let mobileStopPercentage = mobileIntersectionT * 100; if (mobileStopPercentage < 5) { mobileStopPercentage = 42; }
+            if (root) { root.style.setProperty('--mobile-intersection-point', mobileStopPercentage + '%'); }
+            const lineEl = document.querySelector('.aj-careers .vertical-line');
+            if (lineEl) {
+              const lineX = containerWidth * 0.8; lineEl.setAttribute('x1', lineX); lineEl.setAttribute('x2', lineX); lineEl.setAttribute('y1', 0); lineEl.setAttribute('y2', containerHeight);
+              if (root) { root.style.setProperty('--mobile-line-length', containerHeight + 'px'); }
+            }
+            const circleEl = document.querySelector('.aj-careers .moving-circle'); if (circleEl) { circleEl.style.offsetPath = `path('${quarterCirclePath}')`; }
+          } else {
+            const root = svgEl ? svgEl.closest('.aj-careers') : document.querySelector('.aj-careers');
+            const pathLength = pathEl.getTotalLength(); if (root) { root.style.setProperty('--path-length', pathLength + 'px'); }
+            const intersectionT = calculateIntersectionPoint(); let stopPercentage = intersectionT * 100; if (stopPercentage < 5) { stopPercentage = 42; }
+            if (root) { root.style.setProperty('--intersection-point', stopPercentage + '%'); }
+          }
+        }
+      }
+      function careersInitialize() {
+        setupSVGAnimations();
+        setTimeout(() => {
+          const container = document.querySelector('.aj-careers');
+          const heroTitle = container && container.querySelector('.hero-title');
+          const heroSubtitle = container && container.querySelector('.hero-subtitle');
+          if (heroTitle) heroTitle.classList.add('is-visible');
+          setTimeout(() => { if (heroSubtitle) heroSubtitle.classList.add('is-visible'); }, 300);
+        }, 500);
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', careersInitialize); } else { careersInitialize(); }
+      let careersResizeTimeout; window.addEventListener('resize', () => { clearTimeout(careersResizeTimeout); careersResizeTimeout = setTimeout(setupSVGAnimations, 250); });
+    })();
+
+    /* HERO scripts (scoped) */
+    (function(){
+      if (!document.querySelector('.aj-hero')) return;
+      function updateArcGeometry() {
+        const svg = document.getElementById('heroanim-arc-svg');
+        const pathEl = document.getElementById('heroanim-semicircle-path');
+        if (!svg || !pathEl) return;
+        const rect = svg.getBoundingClientRect();
+        const containerWidth = Math.max(rect.width, 1);
+        const containerHeight = Math.max(rect.height, 1);
+        const aspectRatio = containerWidth / containerHeight;
+        const viewBoxHeight = 100; const viewBoxWidth = Math.max(100 * aspectRatio, 1);
+        svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+        const isBelow680px = window.innerWidth <= 680;
+        const baselineY = isBelow680px ? 50 : 0;
+        const rx = viewBoxWidth / 2; const ry = isBelow680px ? 50 : viewBoxHeight;
+        const d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}`; pathEl.setAttribute('d', d);
+        const pathLength = pathEl.getTotalLength();
+        const root = svg.closest('.aj-hero');
+        if (root) { root.style.setProperty('--path-length', pathLength); }
+        const motionPath = `path('M 0 ${baselineY} A ${rx} ${ry} 0 0 0 ${viewBoxWidth} ${baselineY}')`;
+        const movingLine = document.querySelector('.aj-hero .moving-vertical-line'); if (movingLine) movingLine.style.offsetPath = motionPath;
+        const movingCircle = document.querySelector('.aj-hero .moving-circle'); if (movingCircle) movingCircle.style.offsetPath = motionPath;
+      }
+      class TextRevealAnimator {
+        constructor(config, onComplete) { this.config = config; this.onComplete = onComplete; this.spans = []; this.isAnimating = false; }
+        init() { this.createSpans(); this.startAnimation(); }
+        createSpans() {
+          const headline = document.getElementById('heroanim-headline'); if (!headline) return; headline.innerHTML = '';
+          const chars = (this.config.text || '').split('');
+          chars.forEach((char, index) => { const span = document.createElement('span'); if (char === ' ') { span.innerHTML = '&nbsp;'; span.style.whiteSpace = 'pre'; } else { span.textContent = char; } span.dataset.index = index; headline.appendChild(span); });
+          this.spans = headline.querySelectorAll('span');
+        }
+        startAnimation() { if (this.isAnimating || !this.spans.length) return; this.isAnimating = true; requestAnimationFrame(() => { this.calculateRevealTiming(); }); }
+        calculateRevealTiming() {
+          const viewportWidth = window.innerWidth; let maxRevealTime = 0;
+          this.spans.forEach((span) => { const rect = span.getBoundingClientRect(); const spanCenterX = rect.left + (rect.width / 2); const positionPercent = (spanCenterX / viewportWidth) * 100; const revealTime = (positionPercent / this.config.pathEndPosition) * this.config.animationDuration; maxRevealTime = Math.max(maxRevealTime, Math.max(0, revealTime)); setTimeout(() => { span.classList.add('revealed'); }, Math.max(0, revealTime)); });
+          const completionDelayMs = maxRevealTime + 320; if (typeof this.onComplete === 'function') { setTimeout(() => { this.onComplete(); }, completionDelayMs); }
+        }
+      }
+      function heroInitialize() {
+        updateArcGeometry();
+        const headlineElement = document.getElementById('heroanim-headline');
+        const heroTitle = document.querySelector('.aj-hero .hero-title');
+        setTimeout(() => {
+          const heroSubtitle = document.querySelector('.aj-hero .hero-subtitle');
+          if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
+          if (heroTitle) {
+            heroTitle.style.opacity = '1'; heroTitle.style.visibility = 'visible';
+            const textFromHTML = headlineElement ? (headlineElement.textContent || 'AUGUST JACKSON') : 'AUGUST JACKSON';
+            const dynamicConfig = { text: textFromHTML, animationDuration: 925, pathEndPosition: 60, transitionDelay: 0 };
+            const animator = new TextRevealAnimator(dynamicConfig, () => { if (heroSubtitle) heroSubtitle.classList.add('is-visible'); });
+            animator.init();
+          } else {
+            setTimeout(() => { const hs = document.querySelector('.aj-hero .hero-subtitle'); if (hs) hs.classList.add('is-visible'); }, 1000);
+          }
+        }, 500);
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', heroInitialize); } else { heroInitialize(); }
+      let heroResizeTimeout; window.addEventListener('resize', () => { clearTimeout(heroResizeTimeout); heroResizeTimeout = setTimeout(() => { setTimeout(() => { updateArcGeometry(); const headlineElement = document.getElementById('heroanim-headline'); const heroTitle = document.querySelector('.aj-hero .hero-title'); const heroSubtitle = document.querySelector('.aj-hero .hero-subtitle'); if (heroSubtitle) heroSubtitle.classList.remove('is-visible'); if (heroTitle) { heroTitle.style.opacity = '1'; heroTitle.style.visibility = 'visible'; const textFromHTML = headlineElement ? (headlineElement.textContent || 'AUGUST JACKSON') : 'AUGUST JACKSON'; const dynamicConfig = { text: textFromHTML, animationDuration: 925, pathEndPosition: 60, transitionDelay: 0 }; const animator = new TextRevealAnimator(dynamicConfig, () => { if (heroSubtitle) heroSubtitle.classList.add('is-visible'); }); animator.init(); } else { setTimeout(() => { if (heroSubtitle) heroSubtitle.classList.add('is-visible'); }, 1000); } }, 500); }, 250); });
+    })();
+
+    /* QC scripts (scoped) */
+    (function(){
+      if (!document.querySelector('.aj-qc')) return;
+      function qcUpdateArcGeometry() {
+        const svg = document.getElementById('qc-hero-arc-svg');
+        const pathEl = document.getElementById('qc-quarter-circle-path');
+        if (!svg || !pathEl) return;
+        const isBelow680px = window.innerWidth <= 680;
+        svg.setAttribute('viewBox', '0 0 400 400');
+        const d = 'M0,0 A400,400 0 0,0 400,400'; pathEl.setAttribute('d', d);
+        let motionPath; if (isBelow680px) { motionPath = "path('M0,0 L0,400')"; } else { motionPath = "path('M0,0 A400,400 0 0,0 400,400')"; }
+        const movingCircle = document.querySelector('.aj-qc .moving-circle'); if (movingCircle) movingCircle.style.offsetPath = motionPath;
+      }
+      function qcInitialize() {
+        qcUpdateArcGeometry();
+        setTimeout(() => {
+          const container = document.querySelector('.aj-qc');
+          const heroTitle = container && container.querySelector('.hero-title');
+          const heroSubtitle = container && container.querySelector('.hero-subtitle');
+          if (heroTitle) heroTitle.classList.add('is-visible');
+          setTimeout(() => { if (heroSubtitle) heroSubtitle.classList.add('is-visible'); }, 300);
+        }, 500);
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', qcInitialize); } else { qcInitialize(); }
+      let qcResizeTimeout; window.addEventListener('resize', () => { clearTimeout(qcResizeTimeout); qcResizeTimeout = setTimeout(qcUpdateArcGeometry, 250); });
+    })();
+
+    /* QCO scripts (scoped) */
+    (function(){
+      if (!document.querySelector('.aj-qco')) return;
+      function qcoUpdateArcGeometry() {
+        const svg = document.getElementById('qco-hero-arc-svg');
+        const pathEl = document.getElementById('qco-quarter-circle-path');
+        if (!svg || !pathEl) return;
+        svg.setAttribute('viewBox', '0 0 400 400');
+        const d = 'M0,0 A400,400 0 0,0 400,400'; pathEl.setAttribute('d', d);
+        const motionPath = "path('M0,0 A400,400 0 0,0 400,400')";
+        const movingCircle = document.querySelector('.aj-qco .moving-circle'); if (movingCircle) movingCircle.style.offsetPath = motionPath;
+      }
+      function qcoInitialize() {
+        qcoUpdateArcGeometry();
+        setTimeout(() => {
+          const container = document.querySelector('.aj-qco');
+          const heroTitle = container && container.querySelector('.hero-title');
+          const heroSubtitle = container && container.querySelector('.hero-subtitle');
+          if (heroTitle) heroTitle.classList.add('is-visible');
+          setTimeout(() => { if (heroSubtitle) heroSubtitle.classList.add('is-visible'); }, 300);
+        }, 500);
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', qcoInitialize); } else { qcoInitialize(); }
+      let qcoResizeTimeout; window.addEventListener('resize', () => { clearTimeout(qcoResizeTimeout); qcoResizeTimeout = setTimeout(qcoUpdateArcGeometry, 250); });
+    })();
+
+    /* SEMI scripts (scoped) */
+    (function(){
+      if (!document.querySelector('.aj-semi')) return;
+      function semiUpdateArcGeometry() {
+        const svg = document.getElementById('semi-arc-svg');
+        const pathEl = document.getElementById('semi-semicircle-path');
+        if (!svg || !pathEl) return;
+        const heroSection = document.querySelector('.aj-semi .hero-section');
+        const heroRect = heroSection ? heroSection.getBoundingClientRect() : null; const heroHeight = heroRect ? heroRect.height : window.innerHeight;
+        const isBelow680px = window.innerWidth <= 680;
+        const rect = svg.getBoundingClientRect(); const containerWidth = Math.max(rect.width, 1);
+        const effectiveHeight = isBelow680px ? 180 : heroHeight; const containerHeight = Math.max(effectiveHeight, 1); const aspectRatio = containerWidth / containerHeight;
+        const viewBoxHeight = 100; const viewBoxWidth = Math.max(100 * aspectRatio, 1); svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+        let baselineY, rx, ry, d; if (isBelow680px) { baselineY = viewBoxHeight; rx = viewBoxWidth / 2; ry = 50; d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 1 ${viewBoxWidth} ${baselineY}`; } else { baselineY = viewBoxHeight; rx = viewBoxWidth / 2; ry = viewBoxHeight; d = `M 0 ${baselineY} A ${rx} ${ry} 0 0 1 ${viewBoxWidth} ${baselineY}`; }
+        pathEl.setAttribute('d', d);
+        const pathLength = pathEl.getTotalLength();
+        const root = svg.closest('.aj-semi');
+        if (root) { root.style.setProperty('--path-length', pathLength); }
+        const motionPath = `path('${d}')`;
+        const movingCircle = document.querySelector('.aj-semi .moving-circle'); if (movingCircle) movingCircle.style.offsetPath = motionPath;
+      }
+      function semiInitialize() {
+        semiUpdateArcGeometry();
+        setTimeout(() => { const heroSubtitle = document.querySelector('.aj-semi .hero-subtitle'); if (heroSubtitle) heroSubtitle.classList.add('is-visible'); }, 500);
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', semiInitialize); } else { semiInitialize(); }
+      let semiResizeTimeout; window.addEventListener('resize', () => { clearTimeout(semiResizeTimeout); semiResizeTimeout = setTimeout(semiUpdateArcGeometry, 250); });
+    })();
+  </script>
+
+</body>
+</html>
+
+
