@@ -73,8 +73,6 @@
       letter-spacing: -0.02em;
       text-transform: uppercase;
       color: var(--text-primary);
-      opacity: 0;
-      visibility: hidden;
     }
 
     .hero-subtitle {
@@ -84,42 +82,31 @@
       max-width: 540px;
       font-weight: 400;
       letter-spacing: 0.03em;
+    }
+
+    .hero-fade-in {
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing);
     }
 
-    .hero-subtitle.is-visible {
+    .hero-fade-in.is-visible {
       opacity: 1;
       transform: translateY(0);
-    }
-
-    /* Text Animation */
-    .animated-text span {
-      opacity: 0;
-      display: inline-block;
-      transition: opacity 0.3s var(--animation-easing);
-      will-change: opacity;
-    }
-
-    .animated-text span.revealed {
-      opacity: 1;
     }
 
     /* SVG Animations */
     .moving-circle {
       opacity: 0;
-      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+      animation: elementMove 1.5s var(--animation-easing) 1s forwards;
       will-change: opacity, offset-distance;
     }
-
-
 
     /* Semicircle path animation - right to left reveal */
     .animated-path {
       stroke-dasharray: var(--path-length, 350); /* Dynamic path length */
       opacity: 0;
-      animation: drawSemicircle var(--animation-duration) var(--animation-easing) 0s forwards;
+      animation: drawSemicircle 1s var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
     }
 
@@ -264,19 +251,11 @@
       </div>
     </div>
     <div class="hero-content">
-      <p class="hero-subtitle">Reimagining Executive Summits to Drive Engagement and Innovation at Scale</p>
+      <p class="hero-subtitle hero-fade-in">Reimagining Executive Summits to Drive Engagement and Innovation at Scale</p>
     </div>
   </main>
 
   <script>
-    // Configuration - read text from HTML
-    const CONFIG = {
-      text: document.getElementById('headline')?.textContent || "AUGUST JACKSON",
-      animationDuration: 925,
-      pathEndPosition: 60,
-      transitionDelay: 0
-    };
-
     // Ensure the arc starts and ends at the left/right edges of the visible SVG
     function updateArcGeometry() {
       const svg = document.getElementById('hero-arc-svg');
@@ -329,8 +308,6 @@
 
       motionPath = `path('${d}')`;
 
-
-
       const movingCircle = document.querySelector('.moving-circle');
       if (movingCircle) {
         movingCircle.style.offsetPath = motionPath;
@@ -342,124 +319,16 @@
       }
     }
 
-    // Optimized text reveal animation
-    class TextRevealAnimator {
-      constructor(config, onComplete) {
-        this.config = config;
-        this.onComplete = onComplete;
-        this.spans = [];
-        this.isAnimating = false;
-      }
-
-      init() {
-        this.createSpans();
-        this.startAnimation();
-      }
-
-      createSpans() {
-        const headline = document.getElementById("headline");
-        if (!headline) return;
-
-        headline.innerHTML = "";
-        
-        // Split text into characters, preserving spaces
-        const chars = this.config.text.split("");
-        
-        chars.forEach((char, index) => {
-          const span = document.createElement("span");
-          
-          // Handle spaces specially - use non-breaking space for proper spacing
-          if (char === " ") {
-            span.innerHTML = "&nbsp;";
-            span.style.whiteSpace = "pre";
-          } else {
-            span.textContent = char;
-          }
-          
-          span.dataset.index = index;
-          headline.appendChild(span);
-        });
-
-        this.spans = headline.querySelectorAll('span');
-      }
-
-      startAnimation() {
-        if (this.isAnimating || !this.spans.length) return;
-        this.isAnimating = true;
-
-        // Use requestAnimationFrame for better performance
-        requestAnimationFrame(() => {
-          this.calculateRevealTiming();
-        });
-      }
-
-      calculateRevealTiming() {
-        const viewportWidth = window.innerWidth;
-        let maxRevealTime = 0;
-        
-        this.spans.forEach((span) => {
-          const rect = span.getBoundingClientRect();
-          const spanCenterX = rect.left + (rect.width / 2);
-          const positionPercent = (spanCenterX / viewportWidth) * 100;
-          const revealTime = (positionPercent / this.config.pathEndPosition) * this.config.animationDuration;
-          maxRevealTime = Math.max(maxRevealTime, Math.max(0, revealTime));
-          
-          setTimeout(() => {
-            span.classList.add('revealed');
-          }, Math.max(0, revealTime));
-        });
-
-        // Fire completion slightly after the last span finishes its fade-in
-        const completionDelayMs = maxRevealTime + 320; // 320ms ~ span transition + buffer
-        if (typeof this.onComplete === 'function') {
-          setTimeout(() => {
-            this.onComplete();
-          }, completionDelayMs);
-        }
-      }
-    }
-
     // Initialize when DOM is ready
     function initializeAnimations() {
       // Match arc to current viewport within section
       updateArcGeometry();
       
-      // Check if title exists
-      const headlineElement = document.getElementById('headline');
-      const heroTitle = document.querySelector('.hero-title');
-      
-      // Add 0.5s delay before starting animations
+      // Add 0.5s delay before starting fade-in animation
       setTimeout(() => {
         const heroSubtitle = document.querySelector('.hero-subtitle');
         
-        if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
-        
-        // Only animate title if it exists
-        if (heroTitle) {
-          heroTitle.style.opacity = '1';
-          heroTitle.style.visibility = 'visible';
-          
-          // Read text from HTML element for title animation
-          const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
-          
-          // Create config with text from HTML
-          const dynamicConfig = {
-            text: textFromHTML,
-            animationDuration: 925,
-            pathEndPosition: 60,
-            transitionDelay: 0
-          };
-
-          const animator = new TextRevealAnimator(dynamicConfig, () => {
-            if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-          });
-          animator.init();
-        } else {
-          // If no title, just show subtitle after delay
-          setTimeout(() => {
-            if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-          }, 1000); // 1s delay when no title
-        }
+        if (heroSubtitle) heroSubtitle.classList.add('is-visible');
       }, 500); // 0.5s delay
     }
 
@@ -475,43 +344,7 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        // Add 0.5s delay for text animation on resize too
-        setTimeout(() => {
-          updateArcGeometry();
-          
-          // Check if title exists on resize too
-          const headlineElement = document.getElementById('headline');
-          const heroTitle = document.querySelector('.hero-title');
-          const heroSubtitle = document.querySelector('.hero-subtitle');
-          
-          if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
-          
-          // Only animate title if it exists
-          if (heroTitle) {
-            heroTitle.style.opacity = '1';
-            heroTitle.style.visibility = 'visible';
-            
-            // Read text from HTML element for title animation
-            const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
-            
-            const dynamicConfig = {
-              text: textFromHTML,
-              animationDuration: 925,
-              pathEndPosition: 60,
-              transitionDelay: 0
-            };
-
-            const animator = new TextRevealAnimator(dynamicConfig, () => {
-              if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-            });
-            animator.init();
-          } else {
-            // If no title, just show subtitle after delay
-            setTimeout(() => {
-              if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-            }, 1000); // 1s delay when no title
-          }
-        }, 500); // 0.5s delay
+        updateArcGeometry();
       }, 250);
     });
   </script>

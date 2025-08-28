@@ -74,8 +74,6 @@
       letter-spacing: -0.02em;
       text-transform: uppercase;
       color: var(--text-primary);
-      opacity: 0;
-      visibility: hidden;
     }
 
     .hero-subtitle {
@@ -84,43 +82,32 @@
       color: var(--text-secondary);
       font-weight: 400;
       letter-spacing: 0.03em;
+    }
+
+    .hero-fade-in {
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing);
     }
 
-    .hero-subtitle.is-visible {
+    .hero-fade-in.is-visible {
       opacity: 1;
       transform: translateY(0);
-    }
-
-    /* Text Animation */
-    .animated-text span {
-      opacity: 0;
-      display: inline-block;
-      transition: opacity 0.3s var(--animation-easing);
-      will-change: opacity;
-    }
-
-    .animated-text span.revealed {
-      opacity: 1;
     }
 
     /* SVG Animations */
     .moving-circle {
       opacity: 0;
-      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+      animation: elementMove 1.5s var(--animation-easing) 1s forwards;
       will-change: opacity, offset-distance;
     }
-
-
 
     /* Quarter circle path animation - left-top to right-bottom reveal */
     .animated-path {
       stroke-dasharray: 628; /* π * 400 / 2 for quarter circle radius 400 */
       stroke-dashoffset: 628;
       opacity: 0;
-      animation: drawQuarterCircle var(--animation-duration) var(--animation-easing) 0s forwards;
+      animation: drawQuarterCircle 1s var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
     }
 
@@ -263,27 +250,17 @@
       </div>
     </div>
     <div class="hero-content">
-      <h1 id="headline" class="hero-title animated-text" aria-label="About Us">Our Work</h1>
-      <p class="hero-subtitle">Discover how AJ helps leading organizations energize, align, and inspire stakeholders to achieve lasting impact.</p>
+      <h1 id="headline" class="hero-title hero-fade-in" aria-label="About Us">Our Work</h1>
+      <p class="hero-subtitle hero-fade-in">Discover how AJ helps leading organizations energize, align, and inspire stakeholders to achieve lasting impact.</p>
     </div>
   </main>
 
   <script>
-    // Configuration - read text from HTML
-    const CONFIG = {
-      text: document.getElementById('headline')?.textContent || "AUGUST JACKSON",
-      animationDuration: 925,
-      pathEndPosition: 60,
-      transitionDelay: 0
-    };
-
     // Responsive SVG geometry - circle follows different paths based on screen size
     function updateArcGeometry() {
       const svg = document.getElementById('hero-arc-svg');
       const pathEl = document.getElementById('quarter-circle-path');
       if (!svg || !pathEl) return;
-
-
 
       // Fixed 400x400 viewBox
       svg.setAttribute('viewBox', '0 0 400 400');
@@ -299,85 +276,6 @@
       if (movingCircle) {
         movingCircle.style.offsetPath = motionPath;
       }
-
-
-    }
-
-    // Optimized text reveal animation
-    class TextRevealAnimator {
-      constructor(config, onComplete) {
-        this.config = config;
-        this.onComplete = onComplete;
-        this.spans = [];
-        this.isAnimating = false;
-      }
-
-      init() {
-        this.createSpans();
-        this.startAnimation();
-      }
-
-      createSpans() {
-        const headline = document.getElementById("headline");
-        if (!headline) return;
-
-        headline.innerHTML = "";
-        
-        // Split text into characters, preserving spaces
-        const chars = this.config.text.split("");
-        
-        chars.forEach((char, index) => {
-          const span = document.createElement("span");
-          
-          // Handle spaces specially - use non-breaking space for proper spacing
-          if (char === " ") {
-            span.innerHTML = "&nbsp;";
-            span.style.whiteSpace = "pre";
-          } else {
-            span.textContent = char;
-          }
-          
-          span.dataset.index = index;
-          headline.appendChild(span);
-        });
-
-        this.spans = headline.querySelectorAll('span');
-      }
-
-      startAnimation() {
-        if (this.isAnimating || !this.spans.length) return;
-        this.isAnimating = true;
-
-        // Use requestAnimationFrame for better performance
-        requestAnimationFrame(() => {
-          this.calculateRevealTiming();
-        });
-      }
-
-      calculateRevealTiming() {
-        const viewportWidth = window.innerWidth;
-        let maxRevealTime = 0;
-        
-        this.spans.forEach((span) => {
-          const rect = span.getBoundingClientRect();
-          const spanCenterX = rect.left + (rect.width / 2);
-          const positionPercent = (spanCenterX / viewportWidth) * 100;
-          const revealTime = (positionPercent / this.config.pathEndPosition) * this.config.animationDuration;
-          maxRevealTime = Math.max(maxRevealTime, Math.max(0, revealTime));
-          
-          setTimeout(() => {
-            span.classList.add('revealed');
-          }, Math.max(0, revealTime));
-        });
-
-        // Fire completion slightly after the last span finishes its fade-in
-        const completionDelayMs = maxRevealTime + 320; // 320ms ~ span transition + buffer
-        if (typeof this.onComplete === 'function') {
-          setTimeout(() => {
-            this.onComplete();
-          }, completionDelayMs);
-        }
-      }
     }
 
     // Initialize when DOM is ready
@@ -385,33 +283,17 @@
       // Set responsive SVG geometry
       updateArcGeometry();
       
-      // Read text from HTML element
-      const headlineElement = document.getElementById('headline');
-      const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
-      
-      // Create config with text from HTML
-      const dynamicConfig = {
-        text: textFromHTML,
-        animationDuration: 925,
-        pathEndPosition: 60,
-        transitionDelay: 0
-      };
-      
-      // Add 0.5s delay before starting text animation
+      // Add 0.5s delay before starting fade-in animation
       setTimeout(() => {
-        const heroSubtitle = document.querySelector('.hero-subtitle');
         const heroTitle = document.querySelector('.hero-title');
+        const heroSubtitle = document.querySelector('.hero-subtitle');
         
-        if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
-        if (heroTitle) {
-          heroTitle.style.opacity = '1';
-          heroTitle.style.visibility = 'visible';
-        }
-
-        const animator = new TextRevealAnimator(dynamicConfig, () => {
+        if (heroTitle) heroTitle.classList.add('is-visible');
+        
+        // Add subtitle after title animation completes
+        setTimeout(() => {
           if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-        });
-        animator.init();
+        }, 300); // 300ms delay after title
       }, 500); // 0.5s delay
     }
 
@@ -430,8 +312,6 @@
         updateArcGeometry();
       }, 250);
     });
-
-
   </script>
 </body>
 </html>

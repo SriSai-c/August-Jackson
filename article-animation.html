@@ -77,8 +77,6 @@
       letter-spacing: -0.02em;
       text-transform: uppercase;
       color: var(--text-primary);
-      opacity: 0;
-      visibility: hidden;
     }
 
     .hero-subtitle {
@@ -88,48 +86,37 @@
       max-width: 540px;
       font-weight: 400;
       letter-spacing: 0.03em;
+    }
+
+    .hero-fade-in {
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 0.6s var(--animation-easing), transform 0.6s var(--animation-easing);
     }
 
-    .hero-subtitle.is-visible {
+    .hero-fade-in.is-visible {
       opacity: 1;
       transform: translateY(0);
-    }
-
-    /* Text Animation */
-    .animated-text span {
-      opacity: 0;
-      display: inline-block;
-      transition: opacity 0.3s var(--animation-easing);
-      will-change: opacity;
-    }
-
-    .animated-text span.revealed {
-      opacity: 1;
     }
 
     /* SVG Animations */
     .moving-circle {
       opacity: 1;
-      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+      animation: elementMove 1.5s var(--animation-easing) 1s forwards;
       will-change: opacity, offset-distance;
     }
 
     /* Animation for all devices - stops at intersection point */
     .moving-circle {
-      animation: elementMove var(--animation-duration) var(--animation-easing) var(--animation-duration) forwards;
+      animation: elementMove 1.5s var(--animation-easing) 1s forwards;
     }
-
-
 
     /* Arc path animation - right to left reveal */
     .animated-path {
       stroke-dasharray: var(--path-length, 600); /* Dynamic path length */
       stroke-dashoffset: var(--path-length, 600);
       opacity: 0;
-      animation: drawQuarterCircle var(--animation-duration) var(--animation-easing) 0s forwards;
+      animation: drawQuarterCircle 1s var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
     }
 
@@ -204,7 +191,7 @@
       stroke-dasharray: 433;
       stroke-dashoffset: 433;
       opacity: 0;
-      animation: fadeInVerticalLine var(--animation-duration) var(--animation-easing) 0s forwards;
+      animation: fadeInVerticalLine 1s var(--animation-easing) 0s forwards;
       will-change: stroke-dashoffset, opacity;
     }
 
@@ -277,23 +264,15 @@
       </div>
     </div>
     <div class="hero-content">
-      <h1 id="headline" class="hero-title animated-text" aria-label="About Us">Written by Author name, Title</h1>
-      <p class="hero-subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pretium ipsum ut tortor tempor suscipit. Duis tempor eros massa, a congue justo scelerisque non. Morbi efficitur tortor vitae felis ultrices ultrices. Suspendisse viverra pellentesque nisl. Nam augue neque, congue a elit sed, consectetur fringilla lectus. Morbi mauris augue, vehicula ultrices neque ac, venenatis cursus massa. Etiam non quam turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      <h1 id="headline" class="hero-title hero-fade-in" aria-label="About Us">Written by Author name, Title</h1>
+      <p class="hero-subtitle hero-fade-in">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pretium ipsum ut tortor tempor suscipit. Duis tempor eros massa, a congue justo scelerisque non. Morbi efficitur tortor vitae felis ultrices ultrices. Suspendisse viverra pellentesque nisl. Nam augue neque, congue a elit sed, consectetur fringilla lectus. Morbi mauris augue, vehicula ultrices neque ac, venenatis cursus massa. Etiam non quam turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         Cras pretium ipsum ut tortor tempor suscipit. Duis tempor eros massa, a congue justo scelerisque non. Morbi efficitur tortor vitae felis ultrices ultrices. Suspendisse viverra pellentesque nisl. Nam augue neque, congue a elit sed, consectetur fringilla lectus. Morbi mauris augue, vehicula ultrices neque ac, venenatis cursus massa. Etiam non quam turpis.
       </p>
     </div>
   </main>
 
   <script>
-    // Configuration - read text from HTML
-    const CONFIG = {
-      text: document.getElementById('headline')?.textContent || "AUGUST JACKSON",
-      animationDuration: 925,
-      pathEndPosition: 60,
-      transitionDelay: 0
-    };
-
-        // Function to calculate intersection point of cubic bezier curve with vertical line
+    // Function to calculate intersection point of cubic bezier curve with vertical line
     function calculateIntersectionPoint() {
       // For the left-to-right path, we need to find where x=400 (vertical line position)
       // The path goes from left to right: M0,0 -> 423,433 -> 846,0
@@ -380,115 +359,22 @@
       }
     }
 
-    // Optimized text reveal animation
-    class TextRevealAnimator {
-      constructor(config, onComplete) {
-        this.config = config;
-        this.onComplete = onComplete;
-        this.spans = [];
-        this.isAnimating = false;
-      }
-
-      init() {
-        this.createSpans();
-        this.startAnimation();
-      }
-
-      createSpans() {
-        const headline = document.getElementById("headline");
-        if (!headline) return;
-
-        headline.innerHTML = "";
-        
-        // Split text into characters, preserving spaces
-        const chars = this.config.text.split("");
-        
-        chars.forEach((char, index) => {
-          const span = document.createElement("span");
-          
-          // Handle spaces specially - use non-breaking space for proper spacing
-          if (char === " ") {
-            span.innerHTML = "&nbsp;";
-            span.style.whiteSpace = "pre";
-          } else {
-            span.textContent = char;
-          }
-          
-          span.dataset.index = index;
-          headline.appendChild(span);
-        });
-
-        this.spans = headline.querySelectorAll('span');
-      }
-
-      startAnimation() {
-        if (this.isAnimating || !this.spans.length) return;
-        this.isAnimating = true;
-
-        // Use requestAnimationFrame for better performance
-        requestAnimationFrame(() => {
-          this.calculateRevealTiming();
-        });
-      }
-
-      calculateRevealTiming() {
-        const viewportWidth = window.innerWidth;
-        let maxRevealTime = 0;
-        
-        this.spans.forEach((span) => {
-          const rect = span.getBoundingClientRect();
-          const spanCenterX = rect.left + (rect.width / 2);
-          const positionPercent = (spanCenterX / viewportWidth) * 100;
-          const revealTime = (positionPercent / this.config.pathEndPosition) * this.config.animationDuration;
-          maxRevealTime = Math.max(maxRevealTime, Math.max(0, revealTime));
-          
-          setTimeout(() => {
-            span.classList.add('revealed');
-          }, Math.max(0, revealTime));
-        });
-
-        // Fire completion slightly after the last span finishes its fade-in
-        const completionDelayMs = maxRevealTime + 320; // 320ms ~ span transition + buffer
-        if (typeof this.onComplete === 'function') {
-          setTimeout(() => {
-            this.onComplete();
-          }, completionDelayMs);
-        }
-      }
-    }
-
     // Initialize when DOM is ready
     function initializeAnimations() {
       // Set consistent SVG geometry for all devices
       updateArcGeometry();
       
-      // Read text from HTML element
-      const headlineElement = document.getElementById('headline');
-      const textFromHTML = headlineElement?.textContent || "AUGUST JACKSON";
-      
-      // Create config with text from HTML
-      const dynamicConfig = {
-        text: textFromHTML,
-        animationDuration: 925,
-        pathEndPosition: 60,
-        transitionDelay: 0
-      };
-      
-      // Add 0.5s delay before starting text animation
+      // Add 0.5s delay before starting fade-in animation
       setTimeout(() => {
-        const heroSubtitle = document.querySelector('.hero-subtitle');
         const heroTitle = document.querySelector('.hero-title');
+        const heroSubtitle = document.querySelector('.hero-subtitle');
         
-        if (heroSubtitle) heroSubtitle.classList.remove('is-visible');
-        if (heroTitle) {
-          heroTitle.style.opacity = '1';
-          heroTitle.style.visibility = 'visible';
-        }
-
-        const animator = new TextRevealAnimator(dynamicConfig, () => {
+        if (heroTitle) heroTitle.classList.add('is-visible');
+        
+        // Add subtitle after title animation completes
+        setTimeout(() => {
           if (heroSubtitle) heroSubtitle.classList.add('is-visible');
-        });
-        animator.init();
+        }, 300); // 300ms delay after title
       }, 500); // 0.5s delay
     }
 
@@ -507,8 +393,6 @@
         updateArcGeometry();
       }, 250);
     });
-
-
   </script>
 </body>
 </html>
